@@ -1,8 +1,10 @@
+import MainLayout from "./layouts/main/MainLayout";
+
 function App() {
   return (
-    <div>
+    <MainLayout>
       <h1>Invencio UI</h1>
-    </div>
+    </MainLayout>
   );
 }
 
