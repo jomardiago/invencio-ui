@@ -1,4 +1,11 @@
-import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
+import {
+  Button,
+  Form,
+  InlineLoading,
+  InlineNotification,
+  Stack,
+  TextInput,
+} from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,6 +48,17 @@ function LoginForm() {
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
+      {login.error && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title="Login Failed:"
+            subtitle={login.error?.message}
+            lowContrast
+          />
+        </div>
+      )}
+
       <Stack gap={4}>
         <TextInput
           id="email"
