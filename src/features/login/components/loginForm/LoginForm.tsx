@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLoginMutation } from "../../../../apis/auth/loginMutation";
+import useSessionStore from "../../../../stores/sessionStore";
 
 const formSchema = z.object({
   email: z
@@ -27,6 +28,7 @@ const formSchema = z.object({
 
 function LoginForm() {
   const login = useLoginMutation();
+  const { setSession } = useSessionStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,10 +40,7 @@ function LoginForm() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     login.mutate(values, {
       onSuccess: (data) => {
-        console.log(data);
-      },
-      onError: (error) => {
-        console.log(error.message);
+        setSession(data);
       },
     });
   };
