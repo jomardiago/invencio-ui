@@ -1,0 +1,28 @@
+@import "@carbon/colors";
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .loginFormWrapper {
+    min-width: 500px;
+    padding: 1rem;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    .loginFormHeader {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      p {
+        color: $gray-50;
+      }
+    }
+  }
+}
