@@ -1,8 +1,10 @@
+import AppLayout from "../layouts/app/AppLayout";
+
 function HomePage() {
   return (
-    <div>
+    <AppLayout>
       <h1>Invencio UI</h1>
-    </div>
+    </AppLayout>
   );
 }
 

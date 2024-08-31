@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLoginMutation } from "../../../../apis/auth/loginMutation";
 import useSessionStore from "../../../../stores/sessionStore";
+import { useNavigate } from "react-router";
 
 const formSchema = z.object({
   email: z
@@ -29,6 +30,7 @@ const formSchema = z.object({
 function LoginForm() {
   const login = useLoginMutation();
   const { setSession } = useSessionStore();
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,6 +43,7 @@ function LoginForm() {
     login.mutate(values, {
       onSuccess: (data) => {
         setSession(data);
+        navigate("/");
       },
     });
   };
