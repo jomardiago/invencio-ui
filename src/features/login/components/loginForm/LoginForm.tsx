@@ -1,7 +1,8 @@
-import { Button, Form, Stack, TextInput } from "@carbon/react";
+import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useLoginMutation } from "../../../../apis/auth/loginMutation";
 
 const formSchema = z.object({
   email: z
@@ -18,6 +19,7 @@ const formSchema = z.object({
 });
 
 function LoginForm() {
+  const login = useLoginMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -27,7 +29,14 @@ function LoginForm() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    login.mutate(values, {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: (error) => {
+        console.log(error.message);
+      },
+    });
   };
 
   return (
@@ -49,7 +58,11 @@ function LoginForm() {
           invalid={Boolean(form.formState.errors.password)}
           invalidText={form.formState.errors.password?.message}
         />
-        <Button type="submit">Login</Button>
+        {login.isPending ? (
+          <InlineLoading description="Logging in..." />
+        ) : (
+          <Button type="submit">Login</Button>
+        )}
       </Stack>
     </Form>
   );
