@@ -5,10 +5,11 @@ import classes from "./SideRail.module.scss";
 type SideRailProps = {
   isOpen: boolean;
   onCloseHandler: () => void;
+  title: string;
   children: React.ReactNode;
 };
 
-function SideRail({ isOpen, onCloseHandler, children }: SideRailProps) {
+function SideRail({ isOpen, onCloseHandler, title, children }: SideRailProps) {
   const className = isOpen
     ? `${classes.container} ${classes.open}`
     : `${classes.container}`;
@@ -25,7 +26,10 @@ function SideRail({ isOpen, onCloseHandler, children }: SideRailProps) {
           hasIconOnly
         />
       </div>
-      <div className={classes.content}>{children}</div>
+      <div className={classes.content}>
+        <h3>{title}</h3>
+        <div>{children}</div>
+      </div>
     </Theme>
   );
 }

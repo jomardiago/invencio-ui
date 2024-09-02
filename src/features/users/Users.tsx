@@ -11,6 +11,7 @@ function Users() {
       <SideRail
         isOpen={isUsersFormOpen}
         onCloseHandler={() => setIsUsersFormOpen(false)}
+        title="Create User"
       >
         <UsersForm />
       </SideRail>
