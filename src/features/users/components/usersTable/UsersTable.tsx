@@ -1,6 +1,8 @@
+import { UserMultiple } from "@carbon/icons-react";
 import {
   Button,
   DataTable,
+  Loading,
   Table,
   TableBody,
   TableCell,
@@ -9,24 +11,12 @@ import {
   TableHeader,
   TableRow,
   TableToolbar,
-  TableToolbarAction,
   TableToolbarContent,
-  TableToolbarMenu,
   TableToolbarSearch,
 } from "@carbon/react";
-
-const rows = [
-  {
-    id: "1",
-    email: "josediago@gmail.com",
-    isAdmin: true,
-    createdAt: "2024-08-29T04:07:32.009Z",
-    firstName: "Jose",
-    lastName: "Diago",
-    contactNumber: "0912-345-6789",
-    address: "Manila, Philippines",
-  },
-];
+import { format } from "date-fns";
+import { useUsersQuery } from "../../../../apis/users/useUsersQuery";
+import useSessionStore from "../../../../stores/sessionStore";
 
 const headers = [
   {
@@ -60,8 +50,30 @@ const headers = [
 ];
 
 function UsersTable() {
+  const { session } = useSessionStore();
+  const users = useUsersQuery(session?.id);
+
+  const buildUsers = () => {
+    if (!users.data) return [];
+
+    return users.data.map((user) => ({
+      id: String(user.id),
+      email: user.email,
+      isAdmin: user.isAdmin ? "Y" : "N",
+      firstName: user.Profile?.firstName,
+      lastName: user.Profile?.lastName,
+      contactNumber: user.Profile?.contactNumber,
+      address: user.Profile?.address,
+      createdAt: format(user.createdAt, "PPPP"),
+    }));
+  };
+
+  if (users.isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <DataTable rows={rows} headers={headers}>
+    <DataTable rows={buildUsers()} headers={headers}>
       {({
         rows,
         headers,
@@ -70,34 +82,28 @@ function UsersTable() {
         getTableProps,
         getToolbarProps,
         getTableContainerProps,
+        onInputChange,
       }) => (
         <TableContainer
-          title="Users Management"
+          title={
+            <div>
+              <UserMultiple /> Users Management
+            </div>
+          }
           description="Manage all the users in your organization."
           {...getTableContainerProps()}
         >
           <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
             <TableToolbarContent>
-              <TableToolbarSearch />
-              <TableToolbarMenu>
-                <TableToolbarAction onClick={() => {}}>
-                  Action 1
-                </TableToolbarAction>
-                <TableToolbarAction onClick={() => {}}>
-                  Action 2
-                </TableToolbarAction>
-                <TableToolbarAction onClick={() => {}}>
-                  Action 3
-                </TableToolbarAction>
-              </TableToolbarMenu>
-              <Button onClick={() => {}}>Primary Button</Button>
+              <TableToolbarSearch onChange={onInputChange} />
+              <Button onClick={() => {}}>Add New User</Button>
             </TableToolbarContent>
           </TableToolbar>
           <Table {...getTableProps()} aria-label="sample table">
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })}>
+                  <TableHeader {...getHeaderProps({ header })} key={header.key}>
                     {header.header}
                   </TableHeader>
                 ))}
@@ -105,7 +111,7 @@ function UsersTable() {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow {...getRowProps({ row })}>
+                <TableRow {...getRowProps({ row })} key={row.id}>
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value}</TableCell>
                   ))}

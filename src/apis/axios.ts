@@ -8,15 +8,15 @@ export const getApiHeaders = () => {
   const sessionStore = localStorage.getItem("sessionStore")
     ? JSON.parse(localStorage.getItem("sessionStore")!)
     : undefined;
-  let accessToken;
+  let token;
 
   if (sessionStore) {
-    accessToken = sessionStore.state.session.accessToken;
+    token = sessionStore.state.session.token;
   }
 
   return {
     headers: {
-      authorization: `Bearer ${accessToken}`,
+      authorization: `Bearer ${token}`,
     },
   };
 };
