@@ -18,6 +18,10 @@ import { format } from "date-fns";
 import { useUsersQuery } from "../../../../apis/users/useUsersQuery";
 import useSessionStore from "../../../../stores/sessionStore";
 
+type UsersTableProps = {
+  onAddNewClickHandler: () => void;
+};
+
 const headers = [
   {
     key: "email",
@@ -49,7 +53,7 @@ const headers = [
   },
 ];
 
-function UsersTable() {
+function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
   const { session } = useSessionStore();
   const users = useUsersQuery(session?.id);
 
@@ -96,7 +100,7 @@ function UsersTable() {
           <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
             <TableToolbarContent>
               <TableToolbarSearch onChange={onInputChange} />
-              <Button onClick={() => {}}>Add New User</Button>
+              <Button onClick={onAddNewClickHandler}>Add New User</Button>
             </TableToolbarContent>
           </TableToolbar>
           <Table {...getTableProps()} aria-label="sample table">
