@@ -1,0 +1,17 @@
+@import "@carbon/colors";
+
+.container {
+  min-height: 100vh;
+  padding-left: 280px;
+  padding-top: 70px;
+}
+
+.currentDate {
+  color: $gray-70;
+  font-size: smaller;
+}
+
+.profileInfo {
+  color: $gray-70;
+  font-size: small;
+}
