@@ -84,7 +84,10 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   <SideNavLink renderIcon={Dashboard} href="#">
                     Dashboard
                   </SideNavLink>
-                  <SideNavLink renderIcon={UserMultiple} href="#">
+                  <SideNavLink
+                    renderIcon={UserMultiple}
+                    onClick={() => navigate("/users")}
+                  >
                     Users Management
                   </SideNavLink>
                   <SideNavLink renderIcon={Categories} href="#">
