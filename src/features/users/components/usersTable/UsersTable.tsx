@@ -15,8 +15,8 @@ import {
   TableToolbarSearch,
 } from "@carbon/react";
 import { format } from "date-fns";
-import { useUsersQuery } from "../../../../apis/users/useUsersQuery";
 import useSessionStore from "../../../../stores/sessionStore";
+import { useUsersQuery } from "../../apis/useUsersQuery";
 
 type UsersTableProps = {
   onAddNewClickHandler: () => void;

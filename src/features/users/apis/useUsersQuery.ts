@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance, { getApiHeaders } from "../axios";
-
-const queryKeys = {
-  root: ["users"],
-  byUserId: (userId?: number) => [...queryKeys.root, userId],
-};
+import axiosInstance, {
+  getApiHeaders,
+} from "../../../libs/axios/axiosInstance";
+import { queryKeys } from "./queryKeys";
 
 type Profile = {
   id: number;
