@@ -108,13 +108,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     onClick={() => navigate("/users")}
                     style={{ cursor: "pointer" }}
                   >
-                    Users Management
+                    Users
                   </SideNavLink>
                   <SideNavLink
                     renderIcon={Categories}
+                    onClick={() => navigate("/categories")}
                     style={{ cursor: "pointer" }}
                   >
-                    Product Categories
+                    Categories
                   </SideNavLink>
                   <SideNavLink
                     renderIcon={Product}

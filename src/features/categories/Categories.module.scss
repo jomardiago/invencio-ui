@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  gap: 1rem;
+
+  .formWrapper {
+    flex: 1;
+  }
+
+  .categoriesWrapper {
+    flex: 1;
+  }
+}
