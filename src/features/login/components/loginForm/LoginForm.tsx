@@ -6,12 +6,12 @@ import {
   Stack,
   TextInput,
 } from "@carbon/react";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useLoginMutation } from "../../../../apis/auth/loginMutation";
 import useSessionStore from "../../../../stores/sessionStore";
-import { useNavigate } from "react-router";
+import { useLoginMutation } from "../../apis/loginMutation";
 
 const formSchema = z.object({
   email: z

@@ -1,7 +1,16 @@
-import { Button, Form, Stack, TextInput } from "@carbon/react";
+import {
+  Button,
+  Form,
+  InlineLoading,
+  InlineNotification,
+  Stack,
+  TextInput,
+} from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useCreateUserMutation } from "../../apis/useCreateUserMutation";
+import useSessionStore from "../../../../stores/sessionStore";
 
 const formSchema = z.object({
   email: z
@@ -18,6 +27,8 @@ const formSchema = z.object({
 });
 
 function UsersForm() {
+  const { session } = useSessionStore();
+  const createUser = useCreateUserMutation(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -27,11 +38,26 @@ function UsersForm() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    createUser.mutate(values, {
+      onSuccess: () => {
+        form.reset();
+      },
+    });
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
+      <div style={{ marginBottom: "1rem" }}>
+        {createUser.error && (
+          <InlineNotification
+            kind="error"
+            title="Create User Failed:"
+            subtitle={createUser.error?.message}
+            lowContrast
+          />
+        )}
+      </div>
+
       <Stack gap={4}>
         <TextInput
           id="email"
@@ -49,7 +75,11 @@ function UsersForm() {
           invalid={Boolean(form.formState.errors.password)}
           invalidText={form.formState.errors.password?.message}
         />
-        <Button type="submit">Save</Button>
+        {createUser.isPending ? (
+          <InlineLoading description="Saving..." />
+        ) : (
+          <Button type="submit">Save</Button>
+        )}
       </Stack>
     </Form>
   );
