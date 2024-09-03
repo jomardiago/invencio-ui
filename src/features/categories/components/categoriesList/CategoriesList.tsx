@@ -1,7 +1,18 @@
+import {
+  Button,
+  ContainedList,
+  ContainedListItem,
+  Loading,
+  Theme,
+} from "@carbon/react";
 import { Edit, TrashCan } from "@carbon/icons-react";
-import { Button, ContainedList, ContainedListItem, Theme } from "@carbon/react";
+import useSessionStore from "../../../../stores/sessionStore";
+import { useCategoriesQuery } from "../../apis/useCategoriesQuery";
 
 function CategoriesList() {
+  const { session } = useSessionStore();
+  const categories = useCategoriesQuery(session?.id);
+
   const itemAction = (
     <>
       <Button
@@ -23,13 +34,15 @@ function CategoriesList() {
 
   return (
     <div>
+      <Loading active={categories.isLoading} />
+
       <Theme theme="white">
         <ContainedList label="All Categories" kind="on-page" action={""}>
-          <ContainedListItem action={itemAction}>Gadgets</ContainedListItem>
-          <ContainedListItem action={itemAction}>Automotive</ContainedListItem>
-          <ContainedListItem action={itemAction}>
-            Raw Materials
-          </ContainedListItem>
+          {categories.data?.map((category) => (
+            <ContainedListItem key={category.id} action={itemAction}>
+              {category.name}
+            </ContainedListItem>
+          ))}
         </ContainedList>
       </Theme>
     </div>
