@@ -12,7 +12,7 @@ type Profile = {
   address?: string;
 };
 
-type User = {
+export type User = {
   id: number;
   email: string;
   isAdmin: boolean;
