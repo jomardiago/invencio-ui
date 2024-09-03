@@ -18,6 +18,7 @@ import { useNavigate } from "react-router";
 import {
   Categories,
   Dashboard,
+  Logout,
   Product,
   User,
   UserMultiple,
@@ -27,7 +28,7 @@ import useSessionStore from "../../stores/sessionStore";
 import classes from "./AppLayout.module.scss";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
-  const { session } = useSessionStore();
+  const { session, setSession } = useSessionStore();
   const navigate = useNavigate();
   const [isRendered, setIsRendered] = useState(false);
 
@@ -38,6 +39,11 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       setIsRendered(true);
     }
   }, [session, navigate]);
+
+  const logout = () => {
+    setSession(undefined);
+    navigate("/login");
+  };
 
   if (!isRendered) return <Loading />;
 
@@ -56,7 +62,11 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               isActive={isSideNavExpanded}
               aria-expanded={isSideNavExpanded}
             />
-            <HeaderName href="#" prefix="">
+            <HeaderName
+              prefix=""
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            >
               Invencio
             </HeaderName>
             <div>
@@ -68,9 +78,15 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               <HeaderGlobalAction
                 aria-label={session?.email}
                 onClick={() => {}}
-                tooltipAlignment="end"
               >
                 <User size={20} />
+              </HeaderGlobalAction>
+              <HeaderGlobalAction
+                aria-label="logout"
+                onClick={logout}
+                tooltipAlignment="end"
+              >
+                <Logout size={20} />
               </HeaderGlobalAction>
             </HeaderGlobalBar>
             <Theme theme="g90">
@@ -81,19 +97,29 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                 href="#main-content"
               >
                 <SideNavItems>
-                  <SideNavLink renderIcon={Dashboard} href="#">
+                  <SideNavLink
+                    renderIcon={Dashboard}
+                    style={{ cursor: "pointer" }}
+                  >
                     Dashboard
                   </SideNavLink>
                   <SideNavLink
                     renderIcon={UserMultiple}
                     onClick={() => navigate("/users")}
+                    style={{ cursor: "pointer" }}
                   >
                     Users Management
                   </SideNavLink>
-                  <SideNavLink renderIcon={Categories} href="#">
+                  <SideNavLink
+                    renderIcon={Categories}
+                    style={{ cursor: "pointer" }}
+                  >
                     Product Categories
                   </SideNavLink>
-                  <SideNavLink renderIcon={Product} href="#">
+                  <SideNavLink
+                    renderIcon={Product}
+                    style={{ cursor: "pointer" }}
+                  >
                     Products
                   </SideNavLink>
                 </SideNavItems>
