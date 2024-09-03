@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { TrashCan, UserMultiple } from "@carbon/icons-react";
 import {
   Button,
   DataTable,
   InlineNotification,
   Loading,
+  Modal,
   Table,
   TableBody,
   TableCell,
@@ -67,6 +69,14 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
   const updateUserRole = useUpdateUserRoleMutation(session?.id);
   const deleteUser = useDeleteUserMutation(session?.id);
 
+  const [deleteConfig, setDeleteConfig] = useState<{
+    isOpen: boolean;
+    data: User | undefined;
+  }>({
+    isOpen: false,
+    data: undefined,
+  });
+
   const buildUsers = () => {
     if (!users.data) return [];
 
@@ -86,8 +96,12 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
     updateUserRole.mutate({ id: data.id, isAdmin: value });
   };
 
-  const onDeleteUserHandler = (userId: number) => {
-    deleteUser.mutate(userId);
+  const onDeleteUserHandler = () => {
+    if (deleteConfig.data?.id) {
+      deleteUser.mutate(deleteConfig.data.id, {
+        onSuccess: () => setDeleteConfig({ isOpen: false, data: undefined }),
+      });
+    }
   };
 
   if (users.isLoading) {
@@ -97,6 +111,19 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
   return (
     <div>
       <Loading active={updateUserRole.isPending || deleteUser.isPending} />
+
+      <Modal
+        open={deleteConfig.isOpen}
+        onRequestClose={() =>
+          setDeleteConfig({ isOpen: false, data: undefined })
+        }
+        modalHeading={`Are you sure you want to delete ${deleteConfig.data?.email}? It will delete the record in the database permanently.`}
+        modalLabel="User"
+        primaryButtonText="Delete"
+        secondaryButtonText="Cancel"
+        onRequestSubmit={onDeleteUserHandler}
+        danger
+      />
 
       <div>
         {updateUserRole.isSuccess && (
@@ -202,7 +229,12 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
                               iconDescription="Delete User"
                               tooltipPosition="left"
                               kind="danger"
-                              onClick={() => onDeleteUserHandler(userData.id)}
+                              onClick={() =>
+                                setDeleteConfig({
+                                  isOpen: true,
+                                  data: userData,
+                                })
+                              }
                               hasIconOnly
                             />
                           </TableCell>
