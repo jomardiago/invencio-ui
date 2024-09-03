@@ -1,4 +1,4 @@
-import { UserMultiple } from "@carbon/icons-react";
+import { TrashCan, UserMultiple } from "@carbon/icons-react";
 import {
   Button,
   DataTable,
@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import useSessionStore from "../../../../stores/sessionStore";
 import { User, useUsersQuery } from "../../apis/useUsersQuery";
 import { useUpdateUserRoleMutation } from "../../apis/useUpdateUserRoleMutation";
+import { useDeleteUserMutation } from "../../apis/useDeleteUserMutation";
 
 type UsersTableProps = {
   onAddNewClickHandler: () => void;
@@ -54,12 +55,17 @@ const headers = [
     key: "createdAt",
     header: "Member Since",
   },
+  {
+    key: "deleteUser",
+    header: "",
+  },
 ];
 
 function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
   const { session } = useSessionStore();
   const users = useUsersQuery(session?.id);
   const updateUserRole = useUpdateUserRoleMutation(session?.id);
+  const deleteUser = useDeleteUserMutation(session?.id);
 
   const buildUsers = () => {
     if (!users.data) return [];
@@ -80,18 +86,41 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
     updateUserRole.mutate({ id: data.id, isAdmin: value });
   };
 
+  const onDeleteUserHandler = (userId: number) => {
+    deleteUser.mutate(userId);
+  };
+
   if (users.isLoading) {
     return <Loading />;
   }
 
   return (
     <div>
+      <Loading active={updateUserRole.isPending || deleteUser.isPending} />
+
       <div>
         {updateUserRole.isSuccess && (
           <InlineNotification
             kind="success"
             title="Update User Role:"
             subtitle={updateUserRole.data?.message}
+            lowContrast
+          />
+        )}
+
+        {deleteUser.isSuccess && (
+          <InlineNotification
+            kind="success"
+            title="Delete User:"
+            subtitle={deleteUser.data?.message}
+            lowContrast
+          />
+        )}
+        {deleteUser.isError && (
+          <InlineNotification
+            kind="error"
+            title="Delete User Failed:"
+            subtitle={deleteUser.error?.message}
             lowContrast
           />
         )}
@@ -160,6 +189,21 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
                               onToggle={(value: boolean) =>
                                 onToggleHandler(userData, value)
                               }
+                            />
+                          </TableCell>
+                        );
+                      }
+
+                      if (cell.id.includes("deleteUser") && userData) {
+                        return (
+                          <TableCell key={cell.id}>
+                            <Button
+                              renderIcon={TrashCan}
+                              iconDescription="Delete User"
+                              tooltipPosition="left"
+                              kind="danger"
+                              onClick={() => onDeleteUserHandler(userData.id)}
+                              hasIconOnly
                             />
                           </TableCell>
                         );
