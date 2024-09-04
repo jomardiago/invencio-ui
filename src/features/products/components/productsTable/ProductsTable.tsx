@@ -1,4 +1,4 @@
-import { Product } from "@carbon/icons-react";
+import { Edit, Product, TrashCan } from "@carbon/icons-react";
 import {
   Button,
   DataTable,
@@ -46,6 +46,10 @@ const headers = [
   {
     key: "createdAt",
     header: "Date Added",
+  },
+  {
+    key: "rowActions",
+    header: "",
   },
 ];
 
@@ -127,6 +131,31 @@ function ProductsTable() {
                 {rows.map((row) => (
                   <TableRow {...getRowProps({ row })} key={row.id}>
                     {row.cells.map((cell) => {
+                      if (cell.id.includes("rowActions")) {
+                        return (
+                          <TableCell key={cell.id}>
+                            <div>
+                              <Button
+                                renderIcon={Edit}
+                                iconDescription="Edit Product"
+                                tooltipPosition="left"
+                                kind="secondary"
+                                onClick={() => {}}
+                                hasIconOnly
+                              />
+                              <Button
+                                renderIcon={TrashCan}
+                                iconDescription="Delete Product"
+                                tooltipPosition="left"
+                                kind="danger"
+                                onClick={() => {}}
+                                hasIconOnly
+                              />
+                            </div>
+                          </TableCell>
+                        );
+                      }
+
                       return <TableCell key={cell.id}>{cell.value}</TableCell>;
                     })}
                   </TableRow>
