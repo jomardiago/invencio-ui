@@ -14,7 +14,7 @@ import {
   Theme,
 } from "@carbon/react";
 import { HeaderContainerRenderProps } from "@carbon/react/lib/components/UIShell/HeaderContainer";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   Categories,
   Dashboard,
@@ -30,6 +30,7 @@ import classes from "./AppLayout.module.scss";
 function AppLayout({ children }: { children: React.ReactNode }) {
   const { session, setSession } = useSessionStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isRendered, setIsRendered] = useState(false);
 
   useEffect(() => {
@@ -39,6 +40,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       setIsRendered(true);
     }
   }, [session, navigate]);
+
+  const isActive = (pathName: string) => location.pathname.includes(pathName);
 
   const logout = () => {
     setSession(undefined);
@@ -107,6 +110,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     renderIcon={UserMultiple}
                     onClick={() => navigate("/users")}
                     style={{ cursor: "pointer" }}
+                    isActive={isActive("/users")}
                   >
                     Users
                   </SideNavLink>
@@ -114,6 +118,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     renderIcon={Categories}
                     onClick={() => navigate("/categories")}
                     style={{ cursor: "pointer" }}
+                    isActive={isActive("/categories")}
                   >
                     Categories
                   </SideNavLink>
@@ -121,6 +126,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     renderIcon={Product}
                     onClick={() => navigate("/products")}
                     style={{ cursor: "pointer" }}
+                    isActive={isActive("/products")}
                   >
                     Products
                   </SideNavLink>
