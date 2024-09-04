@@ -16,6 +16,7 @@ import {
 } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
 import { useProductsQuery } from "../../apis/useProductsQuery";
+import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
 
 const headers = [
   {
@@ -54,6 +55,8 @@ function ProductsTable() {
     return products.data.map((product) => ({
       ...product,
       id: String(product.id),
+      buyingPrice: formatToCurrency(product.buyingPrice),
+      sellingPrice: formatToCurrency(product.sellingPrice),
     }));
   };
 
