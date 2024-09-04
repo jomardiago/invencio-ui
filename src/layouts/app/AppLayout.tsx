@@ -119,6 +119,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   </SideNavLink>
                   <SideNavLink
                     renderIcon={Product}
+                    onClick={() => navigate("/products")}
                     style={{ cursor: "pointer" }}
                   >
                     Products

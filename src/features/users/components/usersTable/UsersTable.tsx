@@ -182,7 +182,7 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
                 <Button onClick={onAddNewClickHandler}>Add New User</Button>
               </TableToolbarContent>
             </TableToolbar>
-            <Table {...getTableProps()} aria-label="sample table">
+            <Table {...getTableProps()} aria-label="Users Table">
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
