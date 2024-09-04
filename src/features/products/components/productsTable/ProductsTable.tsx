@@ -17,6 +17,8 @@ import {
 import useSessionStore from "../../../../stores/sessionStore";
 import { useProductsQuery } from "../../apis/useProductsQuery";
 import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
+import SideRail from "../../../../common/components/sideRail/SideRail";
+import ProductForm from "../productForm/ProductForm";
 
 const headers = [
   {
@@ -64,6 +66,10 @@ function ProductsTable() {
   return (
     <div>
       <Loading active={products.isLoading} />
+
+      <SideRail isOpen={true} onCloseHandler={() => {}} title="Create Product">
+        <ProductForm />
+      </SideRail>
 
       <DataTable rows={buildProducts()} headers={headers}>
         {({
