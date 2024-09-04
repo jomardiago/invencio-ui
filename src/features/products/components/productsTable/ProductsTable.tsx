@@ -36,7 +36,7 @@ const headers = [
     header: "Selling Price",
   },
   {
-    key: "categoryId",
+    key: "categoryName",
     header: "Category",
   },
   {
@@ -57,6 +57,7 @@ function ProductsTable() {
       id: String(product.id),
       buyingPrice: formatToCurrency(product.buyingPrice),
       sellingPrice: formatToCurrency(product.sellingPrice),
+      categoryName: product.category.name,
     }));
   };
 

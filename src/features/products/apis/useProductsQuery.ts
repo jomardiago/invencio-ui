@@ -3,6 +3,7 @@ import axiosInstance, {
   getApiHeaders,
 } from "../../../libs/axios/axiosInstance";
 import { queryKeys } from "./queryKeys";
+import { Category } from "../../categories/apis/useCategoriesQuery";
 
 export type Product = {
   id: number;
@@ -12,6 +13,7 @@ export type Product = {
   sellingPrice: string;
   createdAt: string;
   categoryId: number;
+  category: Category;
 };
 
 const findProducts = (): Promise<Product[]> => {
