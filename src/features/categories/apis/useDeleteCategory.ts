@@ -5,20 +5,20 @@ import axiosInstance, {
 import { Category } from "./useCategoriesQuery";
 import { queryKeys } from "./queryKeys";
 
-const updateCategory = (data: Category): Promise<{ message: string }> => {
+const deleteCategory = (category: Category): Promise<{ message: string }> => {
   return axiosInstance
-    .patch(`/categories/${data.id}`, { name: data.name }, getApiHeaders())
+    .delete(`/categories/${category.id}`, getApiHeaders())
     .then((response) => response.data)
     .catch((error) => {
       throw error.response.data;
     });
 };
 
-export const useUpdateCategoryMutation = (userId: number | undefined) => {
+export const useDeleteCategoryMutation = (userId: number | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateCategory,
+    mutationFn: deleteCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.byUserId(userId),

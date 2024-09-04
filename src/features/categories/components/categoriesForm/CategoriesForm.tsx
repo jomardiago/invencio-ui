@@ -41,6 +41,7 @@ function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
   useEffect(() => {
     if (category) {
       form.setValue("name", category.name);
+      form.setFocus("name");
     }
   }, [category, form]);
 
