@@ -19,6 +19,7 @@ import { useProductsQuery } from "../../apis/useProductsQuery";
 import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
 import SideRail from "../../../../common/components/sideRail/SideRail";
 import ProductForm from "../productForm/ProductForm";
+import { useState } from "react";
 
 const headers = [
   {
@@ -50,6 +51,7 @@ const headers = [
 function ProductsTable() {
   const { session } = useSessionStore();
   const products = useProductsQuery(session?.id);
+  const [isCreateProductFormOpen, setIsCreateProductFormOpen] = useState(false);
 
   const buildProducts = () => {
     if (!products.data) return [];
@@ -67,7 +69,11 @@ function ProductsTable() {
     <div>
       <Loading active={products.isLoading} />
 
-      <SideRail isOpen={true} onCloseHandler={() => {}} title="Create Product">
+      <SideRail
+        isOpen={isCreateProductFormOpen}
+        onCloseHandler={() => setIsCreateProductFormOpen(false)}
+        title="Create Product"
+      >
         <ProductForm />
       </SideRail>
 
@@ -97,7 +103,9 @@ function ProductsTable() {
             >
               <TableToolbarContent>
                 <TableToolbarSearch onChange={onInputChange} />
-                <Button onClick={() => {}}>Add New Product</Button>
+                <Button onClick={() => setIsCreateProductFormOpen(true)}>
+                  Add New Product
+                </Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()} aria-label="Products Table">

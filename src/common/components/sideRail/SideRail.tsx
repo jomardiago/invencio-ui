@@ -15,7 +15,7 @@ function SideRail({ isOpen, onCloseHandler, title, children }: SideRailProps) {
     : `${classes.container}`;
 
   return (
-    <Theme theme="white" className={className}>
+    <Theme theme="g90" className={className}>
       <div className={classes.closeButton}>
         <Button
           renderIcon={Close}

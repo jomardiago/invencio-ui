@@ -1,7 +1,16 @@
-import { Button, Form, Stack, TextInput } from "@carbon/react";
+import {
+  Button,
+  Form,
+  Select,
+  SelectItem,
+  Stack,
+  TextInput,
+} from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useCategoriesQuery } from "../../../categories/apis/useCategoriesQuery";
+import useSessionStore from "../../../../stores/sessionStore";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -35,9 +44,14 @@ const formSchema = z.object({
         message: "Price must have up to 2 decimal places.",
       }),
   ),
+  categoryId: z.string().min(1, {
+    message: "Category is required.",
+  }),
 });
 
 function ProductForm() {
+  const { session } = useSessionStore();
+  const categories = useCategoriesQuery(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,6 +59,7 @@ function ProductForm() {
       stock: 0,
       buyingPrice: 0.0,
       sellingPrice: 0.0,
+      categoryId: "",
     },
   });
 
@@ -83,6 +98,18 @@ function ProductForm() {
           invalid={Boolean(form.formState.errors.sellingPrice)}
           invalidText={form.formState.errors.sellingPrice?.message}
         />
+        <Select
+          id="categoryId"
+          labelText="Category"
+          {...form.register("categoryId")}
+          invalid={Boolean(form.formState.errors.categoryId)}
+          invalidText={form.formState.errors.categoryId?.message}
+        >
+          <SelectItem value="" text="Select Category" />
+          {categories.data?.map((category) => (
+            <SelectItem value={String(category.id)} text={category.name} />
+          ))}
+        </Select>
         <Button type="submit">Save</Button>
       </Stack>
     </Form>
