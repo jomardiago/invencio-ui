@@ -1,6 +1,7 @@
 import {
   Button,
   Form,
+  InlineNotification,
   Select,
   SelectItem,
   Stack,
@@ -11,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCategoriesQuery } from "../../../categories/apis/useCategoriesQuery";
 import useSessionStore from "../../../../stores/sessionStore";
+import { useCreateProductMutation } from "../../apis/useCreateProductMutation";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -52,6 +54,7 @@ const formSchema = z.object({
 function ProductForm() {
   const { session } = useSessionStore();
   const categories = useCategoriesQuery(session?.id);
+  const createProduct = useCreateProductMutation(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,11 +67,38 @@ function ProductForm() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    createProduct.mutate(
+      { ...values, categoryId: Number(values.categoryId) },
+      {
+        onSuccess: () => form.reset(),
+      },
+    );
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
+      {createProduct.error && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title="Create Product Failed:"
+            subtitle={createProduct.error?.message}
+            lowContrast
+          />
+        </div>
+      )}
+
+      {createProduct.isSuccess && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="success"
+            title="Create Product Success:"
+            subtitle={createProduct.data?.message}
+            lowContrast
+          />
+        </div>
+      )}
+
       <Stack gap={4}>
         <TextInput
           id="title"

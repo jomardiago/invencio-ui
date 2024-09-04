@@ -20,6 +20,7 @@ import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
 import SideRail from "../../../../common/components/sideRail/SideRail";
 import ProductForm from "../productForm/ProductForm";
 import { useState } from "react";
+import { format } from "date-fns";
 
 const headers = [
   {
@@ -62,6 +63,7 @@ function ProductsTable() {
       buyingPrice: formatToCurrency(product.buyingPrice),
       sellingPrice: formatToCurrency(product.sellingPrice),
       categoryName: product.category.name,
+      createdAt: format(product.createdAt, "PPPP"),
     }));
   };
 
