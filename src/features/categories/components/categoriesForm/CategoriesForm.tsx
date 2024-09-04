@@ -85,6 +85,19 @@ function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
           </div>
         )}
 
+        {(createCategory.isSuccess || updateCategory.isSuccess) && (
+          <div style={{ padding: "1rem 0" }}>
+            <InlineNotification
+              kind="success"
+              title={`${category ? "Update Category" : "Create Category"} Success:`}
+              subtitle={
+                createCategory.data?.message || updateCategory.data?.message
+              }
+              lowContrast
+            />
+          </div>
+        )}
+
         <Stack gap={4}>
           <TextInput
             id="name"

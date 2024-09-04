@@ -56,6 +56,15 @@ function UsersForm() {
             lowContrast
           />
         )}
+
+        {createUser.isSuccess && (
+          <InlineNotification
+            kind="success"
+            title="Create User Success:"
+            subtitle={createUser.data.message}
+            lowContrast
+          />
+        )}
       </div>
 
       <Stack gap={4}>
