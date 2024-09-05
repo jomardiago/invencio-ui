@@ -2,7 +2,9 @@ import { Edit, Product, TrashCan } from "@carbon/icons-react";
 import {
   Button,
   DataTable,
+  InlineNotification,
   Loading,
+  Modal,
   Table,
   TableBody,
   TableCell,
@@ -24,6 +26,7 @@ import SideRail from "../../../../common/components/sideRail/SideRail";
 import ProductForm from "../productForm/ProductForm";
 import { useState } from "react";
 import { format } from "date-fns";
+import { useDeleteProductMutation } from "../../apis/useDeleteProductMutation";
 
 const headers = [
   {
@@ -59,14 +62,38 @@ const headers = [
 function ProductsTable() {
   const { session } = useSessionStore();
   const products = useProductsQuery(session?.id);
+  const deleteProduct = useDeleteProductMutation(session?.id);
   const [isCreateProductFormOpen, setIsCreateProductFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductType>();
+  const [delProductConfig, setDelProductConfig] = useState<{
+    data: ProductType | undefined;
+    isOpen: boolean;
+  }>({ data: undefined, isOpen: false });
 
   const onEditProduct = (id: string) => {
     if (products.data) {
       const product = products.data.find((d) => d.id === Number(id));
       setSelectedProduct(product);
       setIsCreateProductFormOpen(true);
+    }
+  };
+
+  const onDeleteProduct = (id: string) => {
+    if (products.data) {
+      const product = products.data.find((d) => d.id === Number(id));
+      setDelProductConfig({
+        data: product!,
+        isOpen: true,
+      });
+    }
+  };
+
+  const onDeleteProductHandler = () => {
+    if (delProductConfig.data?.id) {
+      deleteProduct.mutate(delProductConfig.data.id, {
+        onSettled: () =>
+          setDelProductConfig({ data: undefined, isOpen: false }),
+      });
     }
   };
 
@@ -85,7 +112,29 @@ function ProductsTable() {
 
   return (
     <div>
-      <Loading active={products.isLoading} />
+      <Loading active={products.isLoading || deleteProduct.isPending} />
+
+      {deleteProduct.error && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title="Delete Product Failed:"
+            subtitle={deleteProduct.error.message}
+            lowContrast
+          />
+        </div>
+      )}
+
+      {deleteProduct.isSuccess && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="success"
+            title="Delete Product Success:"
+            subtitle={deleteProduct.data?.message}
+            lowContrast
+          />
+        </div>
+      )}
 
       <SideRail
         isOpen={isCreateProductFormOpen}
@@ -94,6 +143,19 @@ function ProductsTable() {
       >
         <ProductForm key={selectedProduct?.id} product={selectedProduct} />
       </SideRail>
+
+      <Modal
+        open={delProductConfig.isOpen}
+        onRequestClose={() =>
+          setDelProductConfig({ isOpen: false, data: undefined })
+        }
+        modalHeading={`Are you sure you want to delete ${delProductConfig.data?.title}? It will delete the record in the database permanently.`}
+        modalLabel="Product"
+        primaryButtonText="Delete"
+        secondaryButtonText="Cancel"
+        onRequestSubmit={onDeleteProductHandler}
+        danger
+      />
 
       <DataTable rows={buildProducts()} headers={headers}>
         {({
@@ -160,7 +222,7 @@ function ProductsTable() {
                                 iconDescription="Delete Product"
                                 tooltipPosition="left"
                                 kind="danger"
-                                onClick={() => {}}
+                                onClick={() => onDeleteProduct(row.id)}
                                 hasIconOnly
                               />
                             </div>
