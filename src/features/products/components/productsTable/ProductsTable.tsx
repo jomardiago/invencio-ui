@@ -15,7 +15,10 @@ import {
   TableToolbarSearch,
 } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
-import { useProductsQuery } from "../../apis/useProductsQuery";
+import {
+  Product as ProductType,
+  useProductsQuery,
+} from "../../apis/useProductsQuery";
 import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
 import SideRail from "../../../../common/components/sideRail/SideRail";
 import ProductForm from "../productForm/ProductForm";
@@ -57,6 +60,15 @@ function ProductsTable() {
   const { session } = useSessionStore();
   const products = useProductsQuery(session?.id);
   const [isCreateProductFormOpen, setIsCreateProductFormOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType>();
+
+  const onEditProduct = (id: string) => {
+    if (products.data) {
+      const product = products.data.find((d) => d.id === Number(id));
+      setSelectedProduct(product);
+      setIsCreateProductFormOpen(true);
+    }
+  };
 
   const buildProducts = () => {
     if (!products.data) return [];
@@ -80,7 +92,7 @@ function ProductsTable() {
         onCloseHandler={() => setIsCreateProductFormOpen(false)}
         title="Create Product"
       >
-        <ProductForm />
+        <ProductForm key={selectedProduct?.id} product={selectedProduct} />
       </SideRail>
 
       <DataTable rows={buildProducts()} headers={headers}>
@@ -140,7 +152,7 @@ function ProductsTable() {
                                 iconDescription="Edit Product"
                                 tooltipPosition="left"
                                 kind="secondary"
-                                onClick={() => {}}
+                                onClick={() => onEditProduct(row.id)}
                                 hasIconOnly
                               />
                               <Button

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Button,
   Form,
@@ -13,6 +14,8 @@ import { z } from "zod";
 import { useCategoriesQuery } from "../../../categories/apis/useCategoriesQuery";
 import useSessionStore from "../../../../stores/sessionStore";
 import { useCreateProductMutation } from "../../apis/useCreateProductMutation";
+import { Product } from "../../apis/useProductsQuery";
+import { useUpdateProductMutation } from "../../apis/useUpdateProductMutation";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -51,10 +54,11 @@ const formSchema = z.object({
   }),
 });
 
-function ProductForm() {
+function ProductForm({ product }: { product?: Product }) {
   const { session } = useSessionStore();
   const categories = useCategoriesQuery(session?.id);
   const createProduct = useCreateProductMutation(session?.id);
+  const updateProduct = useUpdateProductMutation(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,34 +70,59 @@ function ProductForm() {
     },
   });
 
+  useEffect(() => {
+    if (product) {
+      form.setValue("title", product.title);
+      form.setValue("stock", product.stock);
+      form.setValue("buyingPrice", parseFloat(product.buyingPrice));
+      form.setValue("sellingPrice", parseFloat(product.sellingPrice));
+      form.setValue("categoryId", String(product.category.id));
+    }
+  }, [product, form]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    createProduct.mutate(
-      { ...values, categoryId: Number(values.categoryId) },
-      {
-        onSuccess: () => form.reset(),
-      },
-    );
+    if (product) {
+      updateProduct.mutate({
+        id: product.id,
+        buyingPrice: values.buyingPrice,
+        categoryId: Number(values.categoryId),
+        sellingPrice: values.sellingPrice,
+        stock: values.stock,
+        title: values.title,
+      });
+    } else {
+      createProduct.mutate(
+        { ...values, categoryId: Number(values.categoryId) },
+        {
+          onSuccess: () => form.reset(),
+        },
+      );
+    }
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      {createProduct.error && (
+      {createProduct.error && updateProduct.error && (
         <div style={{ padding: "1rem 0" }}>
           <InlineNotification
             kind="error"
-            title="Create Product Failed:"
-            subtitle={createProduct.error?.message}
+            title={`${product ? "Update Product" : "Create Product"} Failed:`}
+            subtitle={
+              createProduct.error.message || updateProduct.error.message
+            }
             lowContrast
           />
         </div>
       )}
 
-      {createProduct.isSuccess && (
+      {(createProduct.isSuccess || updateProduct.isSuccess) && (
         <div style={{ padding: "1rem 0" }}>
           <InlineNotification
             kind="success"
-            title="Create Product Success:"
-            subtitle={createProduct.data?.message}
+            title={`${product ? "Update Product" : "Create Product"} Success:`}
+            subtitle={
+              createProduct.data?.message || updateProduct.data?.message
+            }
             lowContrast
           />
         </div>
@@ -137,7 +166,11 @@ function ProductForm() {
         >
           <SelectItem value="" text="Select Category" />
           {categories.data?.map((category) => (
-            <SelectItem value={String(category.id)} text={category.name} />
+            <SelectItem
+              key={category.id}
+              value={String(category.id)}
+              text={category.name}
+            />
           ))}
         </Select>
         <Button type="submit">Save</Button>
