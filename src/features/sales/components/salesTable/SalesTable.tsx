@@ -2,7 +2,9 @@ import { useState } from "react";
 import {
   Button,
   DataTable,
+  InlineNotification,
   Loading,
+  Modal,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +23,7 @@ import { format } from "date-fns";
 import { Edit, SalesOps, TrashCan } from "@carbon/icons-react";
 import SideRail from "../../../../common/components/sideRail/SideRail";
 import SaleForm from "../saleForm/SaleForm";
+import { useDeleteSaleMutation } from "../../apis/useDeleteSaleMutation";
 
 const headers = [
   {
@@ -52,8 +55,13 @@ const headers = [
 function SalesTable() {
   const { session } = useSessionStore();
   const sales = useSalesQuery(session?.id);
+  const deleteSale = useDeleteSaleMutation(session?.id);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale>();
+  const [deleteConfig, setDeleteConfig] = useState<{
+    data: Sale | undefined;
+    isOpen: boolean;
+  }>({ data: undefined, isOpen: false });
 
   const editSale = (saleId: string) => {
     const sale = sales.data?.find((d) => d.id === Number(saleId));
@@ -64,9 +72,26 @@ function SalesTable() {
     }
   };
 
+  const confirmDeleteSale = (saleId: string) => {
+    const sale = sales.data?.find((d) => d.id === Number(saleId));
+
+    if (sale) {
+      setDeleteConfig({
+        data: sale,
+        isOpen: true,
+      });
+    }
+  };
+
   const addSale = () => {
     setIsFormOpen(true);
     setSelectedSale(undefined);
+  };
+
+  const onDeleteSale = () => {
+    deleteSale.mutate(Number(deleteConfig.data?.id), {
+      onSettled: () => setDeleteConfig({ data: undefined, isOpen: false }),
+    });
   };
 
   const buildSales = () => {
@@ -84,7 +109,29 @@ function SalesTable() {
 
   return (
     <div>
-      <Loading active={sales.isLoading} />
+      <Loading active={sales.isLoading || deleteSale.isPending} />
+
+      {deleteSale.isError && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title="Delete Sale Failed:"
+            subtitle={deleteSale.error?.message}
+            lowContrast
+          />
+        </div>
+      )}
+
+      {deleteSale.isSuccess && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="success"
+            title="Delete Sale Success:"
+            subtitle={deleteSale.data?.message}
+            lowContrast
+          />
+        </div>
+      )}
 
       <SideRail
         isOpen={isFormOpen}
@@ -93,6 +140,19 @@ function SalesTable() {
       >
         <SaleForm key={selectedSale?.id} sale={selectedSale} />
       </SideRail>
+
+      <Modal
+        open={deleteConfig.isOpen}
+        onRequestClose={() =>
+          setDeleteConfig({ isOpen: false, data: undefined })
+        }
+        modalHeading={`Are you sure you want to delete sale for ${deleteConfig.data?.product.title}? It will delete the record in the database permanently.`}
+        modalLabel="Sale"
+        primaryButtonText="Delete"
+        secondaryButtonText="Cancel"
+        onRequestSubmit={onDeleteSale}
+        danger
+      />
 
       <DataTable rows={buildSales()} headers={headers}>
         {({
@@ -157,7 +217,7 @@ function SalesTable() {
                                 iconDescription="Delete Sale"
                                 tooltipPosition="left"
                                 kind="danger"
-                                onClick={() => {}}
+                                onClick={() => confirmDeleteSale(row.id)}
                                 hasIconOnly
                               />
                             </div>
