@@ -20,6 +20,7 @@ import {
   Dashboard,
   Logout,
   Product,
+  SalesOps,
   User,
   UserMultiple,
 } from "@carbon/icons-react";
@@ -129,6 +130,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     isActive={isActive("/products")}
                   >
                     Products
+                  </SideNavLink>
+                  <SideNavLink
+                    renderIcon={SalesOps}
+                    onClick={() => navigate("/sales")}
+                    style={{ cursor: "pointer" }}
+                    isActive={isActive("/sales")}
+                  >
+                    Sales
                   </SideNavLink>
                 </SideNavItems>
               </SideNav>
