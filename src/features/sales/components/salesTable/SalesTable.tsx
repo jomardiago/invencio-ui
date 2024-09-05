@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Button,
   DataTable,
@@ -18,6 +19,8 @@ import { useSalesQuery } from "../../apis/useSalesQuery";
 import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
 import { format } from "date-fns";
 import { Edit, SalesOps, TrashCan } from "@carbon/icons-react";
+import SideRail from "../../../../common/components/sideRail/SideRail";
+import SaleForm from "../saleForm/SaleForm";
 
 const headers = [
   {
@@ -40,11 +43,16 @@ const headers = [
     key: "createdAt",
     header: "Date Added",
   },
+  {
+    key: "rowActions",
+    header: "",
+  },
 ];
 
 function SalesTable() {
   const { session } = useSessionStore();
   const sales = useSalesQuery(session?.id);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const buildSales = () => {
     if (!sales.data) return [];
@@ -62,6 +70,14 @@ function SalesTable() {
   return (
     <div>
       <Loading active={sales.isLoading} />
+
+      <SideRail
+        isOpen={isFormOpen}
+        onCloseHandler={() => setIsFormOpen(false)}
+        title="Create Sale"
+      >
+        <SaleForm />
+      </SideRail>
 
       <DataTable rows={buildSales()} headers={headers}>
         {({
@@ -89,7 +105,9 @@ function SalesTable() {
             >
               <TableToolbarContent>
                 <TableToolbarSearch onChange={onInputChange} />
-                <Button onClick={() => {}}>Add New Sale</Button>
+                <Button onClick={() => setIsFormOpen(true)}>
+                  Add New Sale
+                </Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()} aria-label="Sales Table">
