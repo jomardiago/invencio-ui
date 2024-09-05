@@ -1,0 +1,62 @@
+@import "@carbon/colors";
+
+.container {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  .mainWrapper {
+    height: 100px;
+    display: flex;
+
+    .iconWrapper {
+      width: 30%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .icon {
+        color: white;
+      }
+    }
+
+    .contentWrapper {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+
+      .value {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .label {
+        color: $gray-50;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+.magenta {
+  background-color: $magenta-50;
+}
+
+.orange {
+  background-color: $orange-50;
+}
+
+.cyan {
+  background-color: $cyan-50;
+}
+
+.green {
+  background-color: $green-50;
+}
+
+.gray {
+  background-color: $gray-80;
+}
