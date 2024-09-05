@@ -1,6 +1,8 @@
 import {
   Button,
   Form,
+  InlineLoading,
+  InlineNotification,
   Select,
   SelectItem,
   Stack,
@@ -9,6 +11,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import useSessionStore from "../../../../stores/sessionStore";
+import { useCreateSaleMutation } from "../../apis/useCreateSaleMutation";
+import { useProductsQuery } from "../../../products/apis/useProductsQuery";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   productId: z.string().min(1, {
@@ -45,6 +51,9 @@ const formSchema = z.object({
 });
 
 function SaleForm() {
+  const { session } = useSessionStore();
+  const createSale = useCreateSaleMutation(session?.id);
+  const products = useProductsQuery(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,12 +64,59 @@ function SaleForm() {
     },
   });
 
+  const watchProductId = form.watch("productId");
+  useEffect(() => {
+    if (watchProductId) {
+      const product = products.data?.find(
+        (product) => product.id === Number(watchProductId),
+      );
+
+      if (product) {
+        form.setValue("sellingPrice", parseFloat(product.sellingPrice));
+      }
+    }
+  }, [watchProductId, form, products.data]);
+
+  const watchQuantity = form.watch("quantity");
+  useEffect(() => {
+    if (watchQuantity) {
+      const sellingPrice = form.getValues("sellingPrice");
+      const total = watchQuantity * sellingPrice;
+      form.setValue("total", total);
+    }
+  }, [watchQuantity, form]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    createSale.mutate({
+      ...values,
+      productId: Number(values.productId),
+    });
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
+      {createSale.error && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title="Create Sale Failed:"
+            subtitle={createSale.error.message}
+            lowContrast
+          />
+        </div>
+      )}
+
+      {createSale.isSuccess && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="success"
+            title="Create Sale Success:"
+            subtitle={createSale.data?.message}
+            lowContrast
+          />
+        </div>
+      )}
+
       <Stack gap={4}>
         <Select
           id="productId"
@@ -70,6 +126,9 @@ function SaleForm() {
           invalidText={form.formState.errors.productId?.message}
         >
           <SelectItem value="" text="Select Product" />
+          {products.data?.map((product) => (
+            <SelectItem value={product.id} text={product.title} />
+          ))}
         </Select>
         <TextInput
           id="sellingPrice"
@@ -94,7 +153,11 @@ function SaleForm() {
           invalidText={form.formState.errors.total?.message}
           disabled
         />
-        <Button type="submit">Save</Button>
+        {createSale.isPending ? (
+          <InlineLoading description="Saving..." />
+        ) : (
+          <Button type="submit">Save</Button>
+        )}
       </Stack>
     </Form>
   );
