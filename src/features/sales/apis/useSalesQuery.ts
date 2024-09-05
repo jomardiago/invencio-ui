@@ -5,7 +5,7 @@ import axiosInstance, {
 import { Product } from "../../products/apis/useProductsQuery";
 import { salesQueryKeys } from "./queryKeys";
 
-type Sales = {
+export type Sale = {
   id: number;
   sellingPrice: string;
   quantity: number;
@@ -15,7 +15,7 @@ type Sales = {
   product: Omit<Product, "category">;
 };
 
-const findSales = (): Promise<Sales[]> => {
+const findSales = (): Promise<Sale[]> => {
   return axiosInstance
     .get("/sales", getApiHeaders())
     .then((response) => response.data)

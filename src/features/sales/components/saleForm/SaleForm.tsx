@@ -15,6 +15,8 @@ import useSessionStore from "../../../../stores/sessionStore";
 import { useCreateSaleMutation } from "../../apis/useCreateSaleMutation";
 import { useProductsQuery } from "../../../products/apis/useProductsQuery";
 import { useEffect } from "react";
+import { Sale } from "../../apis/useSalesQuery";
+import { useUpdateSaleMutation } from "../../apis/useUpdateSaleMutation";
 
 const formSchema = z.object({
   productId: z.string().min(1, {
@@ -50,9 +52,10 @@ const formSchema = z.object({
   ),
 });
 
-function SaleForm() {
+function SaleForm({ sale }: { sale?: Sale }) {
   const { session } = useSessionStore();
   const createSale = useCreateSaleMutation(session?.id);
+  const updateSale = useUpdateSaleMutation(session?.id);
   const products = useProductsQuery(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -86,32 +89,51 @@ function SaleForm() {
     }
   }, [watchQuantity, form]);
 
+  useEffect(() => {
+    if (sale) {
+      form.setValue("productId", String(sale.productId));
+      form.setValue("quantity", sale.quantity);
+      form.setValue("sellingPrice", parseFloat(sale.sellingPrice));
+      form.setValue("total", parseFloat(sale.total));
+    }
+  }, [sale, form]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    createSale.mutate({
-      ...values,
-      productId: Number(values.productId),
-    });
+    if (sale) {
+      updateSale.mutate({
+        productId: Number(values.productId),
+        quantity: values.quantity,
+        saledId: sale.id,
+        sellingPrice: values.sellingPrice,
+        total: values.total,
+      });
+    } else {
+      createSale.mutate({
+        ...values,
+        productId: Number(values.productId),
+      });
+    }
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      {createSale.error && (
+      {(createSale.error || updateSale.error) && (
         <div style={{ padding: "1rem 0" }}>
           <InlineNotification
             kind="error"
-            title="Create Sale Failed:"
-            subtitle={createSale.error.message}
+            title={`${sale ? "Update Sale" : "Create Sale"} Failed:`}
+            subtitle={createSale.error?.message || updateSale.error?.message}
             lowContrast
           />
         </div>
       )}
 
-      {createSale.isSuccess && (
+      {(createSale.isSuccess || updateSale.isSuccess) && (
         <div style={{ padding: "1rem 0" }}>
           <InlineNotification
             kind="success"
-            title="Create Sale Success:"
-            subtitle={createSale.data?.message}
+            title={`${sale ? "Update Sale" : "Create Sale"} Success:`}
+            subtitle={createSale.data?.message || updateSale.data?.message}
             lowContrast
           />
         </div>

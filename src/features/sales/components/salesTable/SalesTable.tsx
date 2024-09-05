@@ -15,7 +15,7 @@ import {
   TableToolbarSearch,
 } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
-import { useSalesQuery } from "../../apis/useSalesQuery";
+import { Sale, useSalesQuery } from "../../apis/useSalesQuery";
 import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
 import { format } from "date-fns";
 import { Edit, SalesOps, TrashCan } from "@carbon/icons-react";
@@ -53,6 +53,21 @@ function SalesTable() {
   const { session } = useSessionStore();
   const sales = useSalesQuery(session?.id);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedSale, setSelectedSale] = useState<Sale>();
+
+  const editSale = (saleId: string) => {
+    const sale = sales.data?.find((d) => d.id === Number(saleId));
+
+    if (sale) {
+      setSelectedSale(sale);
+      setIsFormOpen(true);
+    }
+  };
+
+  const addSale = () => {
+    setIsFormOpen(true);
+    setSelectedSale(undefined);
+  };
 
   const buildSales = () => {
     if (!sales.data) return [];
@@ -74,9 +89,9 @@ function SalesTable() {
       <SideRail
         isOpen={isFormOpen}
         onCloseHandler={() => setIsFormOpen(false)}
-        title="Create Sale"
+        title="Sale Form"
       >
-        <SaleForm />
+        <SaleForm key={selectedSale?.id} sale={selectedSale} />
       </SideRail>
 
       <DataTable rows={buildSales()} headers={headers}>
@@ -105,9 +120,7 @@ function SalesTable() {
             >
               <TableToolbarContent>
                 <TableToolbarSearch onChange={onInputChange} />
-                <Button onClick={() => setIsFormOpen(true)}>
-                  Add New Sale
-                </Button>
+                <Button onClick={addSale}>Add New Sale</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()} aria-label="Sales Table">
@@ -136,7 +149,7 @@ function SalesTable() {
                                 iconDescription="Edit Sale"
                                 tooltipPosition="left"
                                 kind="secondary"
-                                onClick={() => {}}
+                                onClick={() => editSale(row.id)}
                                 hasIconOnly
                               />
                               <Button
