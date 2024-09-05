@@ -68,7 +68,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             />
             <HeaderName
               prefix=""
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard")}
               style={{ cursor: "pointer" }}
             >
               Invencio
@@ -103,7 +103,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                 <SideNavItems>
                   <SideNavLink
                     renderIcon={Dashboard}
+                    onClick={() => navigate("/dashboard")}
                     style={{ cursor: "pointer" }}
+                    isActive={isActive("/dashboard")}
                   >
                     Dashboard
                   </SideNavLink>

@@ -1,11 +1,14 @@
-import AppLayout from "../layouts/app/AppLayout";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 function HomePage() {
-  return (
-    <AppLayout>
-      <h1>Invencio UI</h1>
-    </AppLayout>
-  );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/dashboard");
+  }, [navigate]);
+
+  return null;
 }
 
 export default HomePage;
