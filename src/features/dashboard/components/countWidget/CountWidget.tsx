@@ -3,7 +3,7 @@ import classes from "./CountWidget.module.scss";
 
 type CountWidgetProps = {
   iconBgColor: "magenta" | "orange" | "cyan" | "green";
-  value: string;
+  value: string | React.ReactNode;
   label: string;
   flex?: number;
   renderIcon: () => React.ReactNode;

@@ -1,25 +1,13 @@
-import {
-  Categories,
-  Product,
-  SalesOps,
-  UserMultiple,
-} from "@carbon/icons-react";
+import { Categories, Product, SalesOps } from "@carbon/icons-react";
 import CountWidget from "./components/countWidget/CountWidget";
 import classes from "./Dashboard.module.scss";
+import UsersCountWidget from "./components/usersCountWidget/UsersCountWidget";
 
 function Dashboard() {
   return (
     <div className={classes.container}>
       <div className={classes.countWidgets}>
-        <CountWidget
-          renderIcon={() => (
-            <UserMultiple size={32} style={{ color: "white" }} />
-          )}
-          value="5"
-          label="Users"
-          iconBgColor="magenta"
-          flex={1}
-        />
+        <UsersCountWidget />
         <CountWidget
           renderIcon={() => <Categories size={32} style={{ color: "white" }} />}
           value="8"
