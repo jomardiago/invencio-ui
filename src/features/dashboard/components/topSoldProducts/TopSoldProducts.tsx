@@ -22,6 +22,9 @@ function TopSoldProducts({ title, data }: TopSoldProductsProps) {
     },
     height: "400px",
     width: "100%",
+    toolbar: {
+      enabled: false,
+    },
   };
 
   return <SimpleBarChart data={data} options={options} />;

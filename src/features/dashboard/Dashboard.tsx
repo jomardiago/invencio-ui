@@ -4,6 +4,7 @@ import CategoriesCountWidget from "./components/categoriesCountWidget/Categories
 import ProductsCountWidget from "./components/productsCountWidget/ProductsCountWidget";
 import TotalSalesWidget from "./components/totalSalesWidget/TotalSalesWidget";
 import TopSoldProductsByQuantity from "./components/topSoldProductsByQuantity/TopSoldProductsByQuantity";
+import TopSoldProductsByTotal from "./components/topSoldProductsByTotal/TopSoldProductsByTotal";
 import classes from "./Dashboard.module.scss";
 
 function Dashboard() {
@@ -20,7 +21,7 @@ function Dashboard() {
           <TopSoldProductsByQuantity />
         </Theme>
         <Theme theme="white" className={classes.chartContainer}>
-          <TopSoldProductsByQuantity />
+          <TopSoldProductsByTotal />
         </Theme>
       </div>
     </div>
