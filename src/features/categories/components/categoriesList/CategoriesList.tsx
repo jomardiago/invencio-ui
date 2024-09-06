@@ -41,14 +41,16 @@ function CategoriesList({ setSelectedCategory }: CategoriesListProps) {
           onClick={() => onCategorySelect(category)}
           hasIconOnly
         />
-        <Button
-          kind="danger"
-          iconDescription="Delete"
-          renderIcon={TrashCan}
-          aria-label="Delete"
-          onClick={() => onCategoryDelete(category)}
-          hasIconOnly
-        />
+        {session?.isAdmin && (
+          <Button
+            kind="danger"
+            iconDescription="Delete"
+            renderIcon={TrashCan}
+            aria-label="Delete"
+            onClick={() => onCategoryDelete(category)}
+            hasIconOnly
+          />
+        )}
       </>
     );
   };

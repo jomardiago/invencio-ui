@@ -110,14 +110,18 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   >
                     Dashboard
                   </SideNavLink>
-                  <SideNavLink
-                    renderIcon={UserMultiple}
-                    onClick={() => navigate("/users")}
-                    style={{ cursor: "pointer" }}
-                    isActive={isActive("/users")}
-                  >
-                    Users
-                  </SideNavLink>
+                  {session?.isAdmin && (
+                    <>
+                      <SideNavLink
+                        renderIcon={UserMultiple}
+                        onClick={() => navigate("/users")}
+                        style={{ cursor: "pointer" }}
+                        isActive={isActive("/users")}
+                      >
+                        Users
+                      </SideNavLink>
+                    </>
+                  )}
                   <SideNavLink
                     renderIcon={Categories}
                     onClick={() => navigate("/categories")}

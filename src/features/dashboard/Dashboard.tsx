@@ -6,12 +6,15 @@ import TotalSalesWidget from "./components/totalSalesWidget/TotalSalesWidget";
 import TopSoldProductsByQuantity from "./components/topSoldProductsByQuantity/TopSoldProductsByQuantity";
 import TopSoldProductsByTotal from "./components/topSoldProductsByTotal/TopSoldProductsByTotal";
 import classes from "./Dashboard.module.scss";
+import useSessionStore from "../../stores/sessionStore";
 
 function Dashboard() {
+  const { session } = useSessionStore();
+
   return (
     <div className={classes.container}>
       <div className={classes.countWidgets}>
-        <UsersCountWidget />
+        {session?.isAdmin && <UsersCountWidget />}
         <CategoriesCountWidget />
         <ProductsCountWidget />
         <TotalSalesWidget />

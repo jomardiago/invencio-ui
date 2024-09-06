@@ -217,14 +217,16 @@ function ProductsTable() {
                                 onClick={() => onEditProduct(row.id)}
                                 hasIconOnly
                               />
-                              <Button
-                                renderIcon={TrashCan}
-                                iconDescription="Delete Product"
-                                tooltipPosition="left"
-                                kind="danger"
-                                onClick={() => onDeleteProduct(row.id)}
-                                hasIconOnly
-                              />
+                              {session?.isAdmin && (
+                                <Button
+                                  renderIcon={TrashCan}
+                                  iconDescription="Delete Product"
+                                  tooltipPosition="left"
+                                  kind="danger"
+                                  onClick={() => onDeleteProduct(row.id)}
+                                  hasIconOnly
+                                />
+                              )}
                             </div>
                           </TableCell>
                         );

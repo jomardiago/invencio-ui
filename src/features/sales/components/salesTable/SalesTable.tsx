@@ -212,14 +212,16 @@ function SalesTable() {
                                 onClick={() => editSale(row.id)}
                                 hasIconOnly
                               />
-                              <Button
-                                renderIcon={TrashCan}
-                                iconDescription="Delete Sale"
-                                tooltipPosition="left"
-                                kind="danger"
-                                onClick={() => confirmDeleteSale(row.id)}
-                                hasIconOnly
-                              />
+                              {session?.isAdmin && (
+                                <Button
+                                  renderIcon={TrashCan}
+                                  iconDescription="Delete Sale"
+                                  tooltipPosition="left"
+                                  kind="danger"
+                                  onClick={() => confirmDeleteSale(row.id)}
+                                  hasIconOnly
+                                />
+                              )}
                             </div>
                           </TableCell>
                         );
