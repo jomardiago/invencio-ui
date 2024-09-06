@@ -132,6 +132,7 @@ function ProductForm({ product }: { product?: Product }) {
         <TextInput
           id="title"
           labelText="Title"
+          autoComplete="off"
           {...form.register("title")}
           invalid={Boolean(form.formState.errors.title)}
           invalidText={form.formState.errors.title?.message}

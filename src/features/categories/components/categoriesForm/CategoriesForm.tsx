@@ -104,6 +104,7 @@ function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
             id="name"
             type="name"
             labelText="Name"
+            autoComplete="off"
             {...form.register("name")}
             invalid={Boolean(form.formState.errors.name)}
             invalidText={form.formState.errors.name?.message}
