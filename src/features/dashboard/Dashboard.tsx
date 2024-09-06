@@ -3,8 +3,8 @@ import UsersCountWidget from "./components/usersCountWidget/UsersCountWidget";
 import CategoriesCountWidget from "./components/categoriesCountWidget/CategoriesCountWidget";
 import ProductsCountWidget from "./components/productsCountWidget/ProductsCountWidget";
 import TotalSalesWidget from "./components/totalSalesWidget/TotalSalesWidget";
+import TopSoldProductsByQuantity from "./components/topSoldProductsByQuantity/TopSoldProductsByQuantity";
 import classes from "./Dashboard.module.scss";
-import TopSoldProducts from "./components/topSoldProducts/TopSoldProducts";
 
 function Dashboard() {
   return (
@@ -17,10 +17,10 @@ function Dashboard() {
       </div>
       <div className={classes.topChartsWrapper}>
         <Theme theme="white" className={classes.chartContainer}>
-          <TopSoldProducts title="Top Sold Products (By Quantity)" />
+          <TopSoldProductsByQuantity />
         </Theme>
         <Theme theme="white" className={classes.chartContainer}>
-          <TopSoldProducts title="Top Sold Products (By Total)" />
+          <TopSoldProductsByQuantity />
         </Theme>
       </div>
     </div>
