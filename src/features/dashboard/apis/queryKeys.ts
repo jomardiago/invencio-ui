@@ -1,4 +1,8 @@
 export const queryKeys = {
   root: ["dashboard"],
-  byUserId: (userId: number | undefined) => [...queryKeys.root, userId],
+  byWidgetType: (userId: number | undefined, widgetType: string) => [
+    ...queryKeys.root,
+    userId,
+    widgetType,
+  ],
 };

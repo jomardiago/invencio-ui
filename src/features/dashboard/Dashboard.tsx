@@ -1,27 +1,17 @@
-import { Categories, Product, SalesOps } from "@carbon/icons-react";
+import { SalesOps } from "@carbon/icons-react";
 import CountWidget from "./components/countWidget/CountWidget";
 import classes from "./Dashboard.module.scss";
 import UsersCountWidget from "./components/usersCountWidget/UsersCountWidget";
+import CategoriesCountWidget from "./components/categoriesCountWidget/CategoriesCountWidget";
+import ProductsCountWidget from "./components/productsCountWidget/ProductsCountWidget";
 
 function Dashboard() {
   return (
     <div className={classes.container}>
       <div className={classes.countWidgets}>
         <UsersCountWidget />
-        <CountWidget
-          renderIcon={() => <Categories size={32} style={{ color: "white" }} />}
-          value="8"
-          label="Categories"
-          iconBgColor="orange"
-          flex={1}
-        />
-        <CountWidget
-          renderIcon={() => <Product size={32} style={{ color: "white" }} />}
-          value="16"
-          label="Products"
-          iconBgColor="cyan"
-          flex={1}
-        />
+        <CategoriesCountWidget />
+        <ProductsCountWidget />
         <CountWidget
           renderIcon={() => <SalesOps size={32} style={{ color: "white" }} />}
           value="P1,000,000.00"

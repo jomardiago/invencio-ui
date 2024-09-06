@@ -4,18 +4,18 @@ import axiosInstance, {
 } from "../../../libs/axios/axiosInstance";
 import { queryKeys } from "./queryKeys";
 
-const findUsersCount = (): Promise<number> => {
+const findProductsCount = (): Promise<number> => {
   return axiosInstance
-    .get("/users/count", getApiHeaders())
+    .get("/products/count", getApiHeaders())
     .then((response) => response.data)
     .catch((error) => {
       throw error.response.data;
     });
 };
 
-export const useUsersCountQuery = (userId: number | undefined) => {
+export const useProductsCountQuery = (userId: number | undefined) => {
   return useQuery({
-    queryKey: queryKeys.byWidgetType(userId, "users"),
-    queryFn: findUsersCount,
+    queryKey: queryKeys.byWidgetType(userId, "products"),
+    queryFn: findProductsCount,
   });
 };
