@@ -52,48 +52,49 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isRendered) return <Loading />;
 
   return (
-    <HeaderContainer
-      render={({
-        isSideNavExpanded,
-        onClickSideNavExpand,
-      }: HeaderContainerRenderProps) => (
-        <>
-          <Header aria-label="Invencio, an Inventory Management System">
-            <SkipToContent />
-            <HeaderMenuButton
-              aria-label={isSideNavExpanded ? "Close menu" : "Open menu"}
-              onClick={onClickSideNavExpand}
-              isActive={isSideNavExpanded}
-              aria-expanded={isSideNavExpanded}
-            />
-            <HeaderName
-              prefix=""
-              onClick={() => navigate("/dashboard")}
-              style={{ cursor: "pointer" }}
-            >
-              Invencio
-            </HeaderName>
-            <div>
-              <p className={classes.currentDate}>
-                {format(new Date(), "PPPP")}
-              </p>
-            </div>
-            <HeaderGlobalBar>
-              <HeaderGlobalAction
-                aria-label={session?.email}
-                onClick={() => {}}
+    <Theme theme="g100">
+      <HeaderContainer
+        render={({
+          isSideNavExpanded,
+          onClickSideNavExpand,
+        }: HeaderContainerRenderProps) => (
+          <>
+            <Header aria-label="Invencio, an Inventory Management System">
+              <SkipToContent />
+              <HeaderMenuButton
+                aria-label={isSideNavExpanded ? "Close menu" : "Open menu"}
+                onClick={onClickSideNavExpand}
+                isActive={isSideNavExpanded}
+                aria-expanded={isSideNavExpanded}
+              />
+              <HeaderName
+                prefix=""
+                onClick={() => navigate("/dashboard")}
+                style={{ cursor: "pointer" }}
               >
-                <User size={20} />
-              </HeaderGlobalAction>
-              <HeaderGlobalAction
-                aria-label="logout"
-                onClick={logout}
-                tooltipAlignment="end"
-              >
-                <Logout size={20} />
-              </HeaderGlobalAction>
-            </HeaderGlobalBar>
-            <Theme theme="g90">
+                Invencio
+              </HeaderName>
+              <div>
+                <p className={classes.currentDate}>
+                  {format(new Date(), "PPPP")}
+                </p>
+              </div>
+              <HeaderGlobalBar>
+                <HeaderGlobalAction
+                  aria-label={session?.email}
+                  onClick={() => {}}
+                >
+                  <User size={20} />
+                </HeaderGlobalAction>
+                <HeaderGlobalAction
+                  aria-label="logout"
+                  onClick={logout}
+                  tooltipAlignment="end"
+                >
+                  <Logout size={20} />
+                </HeaderGlobalAction>
+              </HeaderGlobalBar>
+
               <SideNav
                 aria-label="Side navigation"
                 expanded={isSideNavExpanded}
@@ -143,12 +144,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   </SideNavLink>
                 </SideNavItems>
               </SideNav>
+            </Header>
+            <Theme theme="g10" className={classes.container}>
+              {children}
             </Theme>
-          </Header>
-          <div className={classes.container}>{children}</div>
-        </>
-      )}
-    />
+          </>
+        )}
+      />
+    </Theme>
   );
 }
 
