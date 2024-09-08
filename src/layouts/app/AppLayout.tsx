@@ -51,6 +51,10 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (!isRendered) return <Loading />;
 
+  if (!session) {
+    return <Theme theme="g10">{children}</Theme>;
+  }
+
   return (
     <Theme theme="g100">
       <HeaderContainer
