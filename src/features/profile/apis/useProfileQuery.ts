@@ -4,7 +4,7 @@ import axiosInstance, {
 } from "../../../libs/axios/axiosInstance";
 import { queryKeys } from "./queryKeys";
 
-type Profile = {
+export type Profile = {
   id: number;
   firstName?: string;
   lastName?: string;

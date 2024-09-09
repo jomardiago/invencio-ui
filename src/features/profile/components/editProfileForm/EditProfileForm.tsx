@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Button,
   Form,
@@ -10,10 +10,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useProfileQuery } from "../../apis/useProfileQuery";
 import useSessionStore from "../../../../stores/sessionStore";
 import { useUpdateProfileMutation } from "../../apis/useUpdateProfileMutation";
 import { useCreateProfileMutation } from "../../apis/useCreateProfileMutation";
+import { Profile } from "../../apis/useProfileQuery";
 
 const formSchema = z.object({
   firstName: z.string().max(100, {
@@ -30,12 +30,10 @@ const formSchema = z.object({
   }),
 });
 
-function EditProfileForm() {
+function EditProfileForm({ profile }: { profile?: Profile }) {
   const { session } = useSessionStore();
-  const profile = useProfileQuery(session?.id);
   const updateProfile = useUpdateProfileMutation(session?.id);
   const createProfile = useCreateProfileMutation(session?.id);
-  const [isUpdate, setIsUpdate] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,17 +45,16 @@ function EditProfileForm() {
   });
 
   useEffect(() => {
-    if (profile.data) {
-      form.setValue("firstName", profile.data.firstName || "");
-      form.setValue("lastName", profile.data.lastName || "");
-      form.setValue("contactNumber", profile.data.contactNumber || "");
-      form.setValue("address", profile.data.address || "");
-      setIsUpdate(true);
+    if (profile) {
+      form.setValue("firstName", profile.firstName || "");
+      form.setValue("lastName", profile.lastName || "");
+      form.setValue("contactNumber", profile.contactNumber || "");
+      form.setValue("address", profile.address || "");
     }
   }, [profile, form]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (profile.data) {
+    if (profile) {
       updateProfile.mutate(values);
     } else {
       createProfile.mutate(values);
@@ -70,7 +67,7 @@ function EditProfileForm() {
         <div style={{ padding: "1rem 0" }}>
           <InlineNotification
             kind="error"
-            title={`${isUpdate ? "Update Profile" : "Create Profile"} Failed:`}
+            title={`${profile ? "Update Profile" : "Create Profile"} Failed:`}
             subtitle={
               createProfile.error?.message || updateProfile.error?.message
             }
@@ -83,7 +80,7 @@ function EditProfileForm() {
         <div style={{ padding: "1rem 0" }}>
           <InlineNotification
             kind="success"
-            title={`${isUpdate ? "Update Profile" : "Create Profile"} Success:`}
+            title={`${profile ? "Update Profile" : "Create Profile"} Success:`}
             subtitle={
               createProfile.data?.message || updateProfile.data?.message
             }
