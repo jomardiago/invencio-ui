@@ -2,20 +2,10 @@ import { useState } from "react";
 import { TrashCan, UserMultiple } from "@carbon/icons-react";
 import {
   Button,
-  DataTable,
   InlineNotification,
   Loading,
   Modal,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
   Toggle,
 } from "@carbon/react";
 import { format } from "date-fns";
@@ -23,6 +13,7 @@ import useSessionStore from "../../../../stores/sessionStore";
 import { User, useUsersQuery } from "../../apis/useUsersQuery";
 import { useUpdateUserRoleMutation } from "../../apis/useUpdateUserRoleMutation";
 import { useDeleteUserMutation } from "../../apis/useDeleteUserMutation";
+import DataTable from "../../../../common/components/dataTable/DataTable";
 
 type UsersTableProps = {
   onAddNewClickHandler: () => void;
@@ -153,103 +144,65 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
         )}
       </div>
 
-      <DataTable rows={buildUsers()} headers={headers}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getToolbarProps,
-          getTableContainerProps,
-          onInputChange,
-        }) => (
-          <TableContainer
-            title={
-              <div>
-                <UserMultiple /> Users Management
-              </div>
-            }
-            description="Manage all the users in your organization."
-            {...getTableContainerProps()}
-          >
-            <TableToolbar
-              {...getToolbarProps()}
-              aria-label="data table toolbar"
-            >
-              <TableToolbarContent>
-                <TableToolbarSearch onChange={onInputChange} />
-                <Button onClick={onAddNewClickHandler}>Add New User</Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()} aria-label="Users Table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({ header })}
-                      key={header.key}
-                    >
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })} key={row.id}>
-                    {row.cells.map((cell) => {
-                      const userData = users.data?.find(
-                        (d) => d.id === Number(row.id),
-                      );
+      <DataTable
+        key="usersTable"
+        data={buildUsers()}
+        headers={headers}
+        title={
+          <div>
+            <UserMultiple /> Users Management
+          </div>
+        }
+        description="Manage all the users in your organization."
+        tableLabel="Users Table"
+        addNewConfig={{
+          onClick: onAddNewClickHandler,
+          buttonLabel: "Add New User",
+        }}
+        renderRow={(rowId, cell) => {
+          const userData = users.data?.find((d) => d.id === Number(rowId));
 
-                      if (cell.id.includes("isAdmin") && userData) {
-                        return (
-                          <TableCell key={cell.id}>
-                            <Toggle
-                              size="sm"
-                              labelText=""
-                              labelA="No"
-                              labelB="Yes"
-                              defaultToggled={userData?.isAdmin}
-                              id="isAdmin"
-                              onToggle={(value: boolean) =>
-                                onToggleHandler(userData, value)
-                              }
-                            />
-                          </TableCell>
-                        );
-                      }
+          if (cell.id.includes("isAdmin") && userData) {
+            return (
+              <TableCell key={cell.id}>
+                <Toggle
+                  size="sm"
+                  labelText=""
+                  labelA="No"
+                  labelB="Yes"
+                  defaultToggled={userData?.isAdmin}
+                  id="isAdmin"
+                  onToggle={(value: boolean) =>
+                    onToggleHandler(userData, value)
+                  }
+                />
+              </TableCell>
+            );
+          }
 
-                      if (cell.id.includes("deleteUser") && userData) {
-                        return (
-                          <TableCell key={cell.id}>
-                            <Button
-                              renderIcon={TrashCan}
-                              iconDescription="Delete User"
-                              tooltipPosition="left"
-                              kind="danger"
-                              onClick={() =>
-                                setDeleteConfig({
-                                  isOpen: true,
-                                  data: userData,
-                                })
-                              }
-                              hasIconOnly
-                            />
-                          </TableCell>
-                        );
-                      }
+          if (cell.id.includes("deleteUser") && userData) {
+            return (
+              <TableCell key={cell.id}>
+                <Button
+                  renderIcon={TrashCan}
+                  iconDescription="Delete User"
+                  tooltipPosition="left"
+                  kind="danger"
+                  onClick={() =>
+                    setDeleteConfig({
+                      isOpen: true,
+                      data: userData,
+                    })
+                  }
+                  hasIconOnly
+                />
+              </TableCell>
+            );
+          }
 
-                      return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+          return <TableCell key={cell.id}>{cell.value}</TableCell>;
+        }}
+      />
     </div>
   );
 }
