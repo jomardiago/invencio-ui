@@ -6,10 +6,10 @@ import classes from "./Profile.module.scss";
 function Profile() {
   return (
     <div className={classes.container}>
-      <div>
+      <div className={classes.changePasswordContainer}>
         <ChangePasswordForm />
       </div>
-      <div>
+      <div className={classes.editProfileContainer}>
         <Theme theme="white" className={classes.editProfileWrapper}>
           <h3>Edit Profile</h3>
           <EditProfileForm />

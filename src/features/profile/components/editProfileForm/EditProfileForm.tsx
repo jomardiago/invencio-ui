@@ -1,7 +1,19 @@
-import { Button, Form, Stack, TextInput } from "@carbon/react";
+import { useEffect, useState } from "react";
+import {
+  Button,
+  Form,
+  InlineLoading,
+  InlineNotification,
+  Stack,
+  TextInput,
+} from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useProfileQuery } from "../../apis/useProfileQuery";
+import useSessionStore from "../../../../stores/sessionStore";
+import { useUpdateProfileMutation } from "../../apis/useUpdateProfileMutation";
+import { useCreateProfileMutation } from "../../apis/useCreateProfileMutation";
 
 const formSchema = z.object({
   firstName: z.string().max(100, {
@@ -19,20 +31,67 @@ const formSchema = z.object({
 });
 
 function EditProfileForm() {
+  const { session } = useSessionStore();
+  const profile = useProfileQuery(session?.id);
+  const updateProfile = useUpdateProfileMutation(session?.id);
+  const createProfile = useCreateProfileMutation(session?.id);
+  const [isUpdate, setIsUpdate] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
+      contactNumber: "",
+      address: "",
     },
   });
 
+  useEffect(() => {
+    if (profile.data) {
+      form.setValue("firstName", profile.data.firstName || "");
+      form.setValue("lastName", profile.data.lastName || "");
+      form.setValue("contactNumber", profile.data.contactNumber || "");
+      form.setValue("address", profile.data.address || "");
+      setIsUpdate(true);
+    }
+  }, [profile, form]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    if (profile.data) {
+      updateProfile.mutate(values);
+    } else {
+      createProfile.mutate(values);
+    }
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
+      {(createProfile.error || updateProfile.error) && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title={`${isUpdate ? "Update Profile" : "Create Profile"} Failed:`}
+            subtitle={
+              createProfile.error?.message || updateProfile.error?.message
+            }
+            lowContrast
+          />
+        </div>
+      )}
+
+      {(createProfile.isSuccess || updateProfile.isSuccess) && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="success"
+            title={`${isUpdate ? "Update Profile" : "Create Profile"} Success:`}
+            subtitle={
+              createProfile.data?.message || updateProfile.data?.message
+            }
+            lowContrast
+          />
+        </div>
+      )}
+
       <Stack gap={4}>
         <TextInput
           id="firstName"
@@ -66,7 +125,11 @@ function EditProfileForm() {
           invalid={Boolean(form.formState.errors.address)}
           invalidText={form.formState.errors.address?.message}
         />
-        <Button type="submit">Save</Button>
+        {updateProfile.isPending ? (
+          <InlineLoading description="Saving..." />
+        ) : (
+          <Button type="submit">Save</Button>
+        )}
       </Stack>
     </Form>
   );
