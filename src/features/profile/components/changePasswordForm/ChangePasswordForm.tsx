@@ -1,7 +1,15 @@
-import { Button, Form, Stack, TextInput } from "@carbon/react";
+import {
+  Button,
+  Form,
+  InlineLoading,
+  InlineNotification,
+  Stack,
+  TextInput,
+} from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useChangePasswordMutation } from "../../../auth/api/useChangePasswordMutation";
 
 const formSchema = z.object({
   oldPassword: z.string().min(5, {
@@ -13,6 +21,7 @@ const formSchema = z.object({
 });
 
 function ChangePasswordForm() {
+  const changePassword = useChangePasswordMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -22,11 +31,33 @@ function ChangePasswordForm() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+    changePassword.mutate(values);
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
+      {changePassword.error && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="error"
+            title="Change Password Failed:"
+            subtitle={changePassword.error.message}
+            lowContrast
+          />
+        </div>
+      )}
+
+      {changePassword.isSuccess && (
+        <div style={{ padding: "1rem 0" }}>
+          <InlineNotification
+            kind="success"
+            title="Change Password Success:"
+            subtitle={changePassword.data.message}
+            lowContrast
+          />
+        </div>
+      )}
+
       <Stack gap={4}>
         <TextInput
           id="oldPassword"
@@ -44,7 +75,11 @@ function ChangePasswordForm() {
           invalid={Boolean(form.formState.errors.newPassword)}
           invalidText={form.formState.errors.newPassword?.message}
         />
-        <Button type="submit">Update Password</Button>
+        {changePassword.isPending ? (
+          <InlineLoading description="Saving..." />
+        ) : (
+          <Button type="submit">Update Password</Button>
+        )}
       </Stack>
     </Form>
   );
