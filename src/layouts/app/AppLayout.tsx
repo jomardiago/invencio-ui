@@ -86,7 +86,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
               <HeaderGlobalBar>
                 <HeaderGlobalAction
                   aria-label={session?.email}
-                  onClick={() => {}}
+                  onClick={() => navigate("/profile")}
                 >
                   <User size={20} />
                 </HeaderGlobalAction>
