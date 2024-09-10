@@ -37,9 +37,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!session) {
       navigate("/login");
-    } else {
-      setIsRendered(true);
     }
+
+    setIsRendered(true);
   }, [session, navigate]);
 
   const isActive = (pathName: string) => location.pathname.includes(pathName);
