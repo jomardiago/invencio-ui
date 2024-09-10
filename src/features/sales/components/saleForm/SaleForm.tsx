@@ -2,7 +2,6 @@ import {
   Button,
   Form,
   InlineLoading,
-  InlineNotification,
   Select,
   SelectItem,
   Stack,
@@ -17,6 +16,7 @@ import { useProductsQuery } from "../../../products/apis/useProductsQuery";
 import { useEffect } from "react";
 import { Sale } from "../../apis/useSalesQuery";
 import { useUpdateSaleMutation } from "../../apis/useUpdateSaleMutation";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const formSchema = z.object({
   productId: z.string().min(1, {
@@ -54,6 +54,7 @@ const formSchema = z.object({
 
 function SaleForm({ sale }: { sale?: Sale }) {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const createSale = useCreateSaleMutation(session?.id);
   const updateSale = useUpdateSaleMutation(session?.id);
   const products = useProductsQuery(session?.id);
@@ -100,45 +101,59 @@ function SaleForm({ sale }: { sale?: Sale }) {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (sale) {
-      updateSale.mutate({
-        productId: Number(values.productId),
-        quantity: values.quantity,
-        saledId: sale.id,
-        sellingPrice: values.sellingPrice,
-        total: values.total,
-      });
+      updateSale.mutate(
+        {
+          productId: Number(values.productId),
+          quantity: values.quantity,
+          saledId: sale.id,
+          sellingPrice: values.sellingPrice,
+          total: values.total,
+        },
+        {
+          onSuccess: (data) => {
+            setToastNotification({
+              kind: "success",
+              title: "Update Sale",
+              subTitle: data.message,
+            });
+          },
+          onError: (error) => {
+            setToastNotification({
+              kind: "error",
+              title: "Update Sale",
+              subTitle: error.message,
+            });
+          },
+        },
+      );
     } else {
-      createSale.mutate({
-        ...values,
-        productId: Number(values.productId),
-      });
+      createSale.mutate(
+        {
+          ...values,
+          productId: Number(values.productId),
+        },
+        {
+          onSuccess: (data) => {
+            setToastNotification({
+              kind: "success",
+              title: "Create Sale",
+              subTitle: data.message,
+            });
+          },
+          onError: (error) => {
+            setToastNotification({
+              kind: "error",
+              title: "Create Sale",
+              subTitle: error.message,
+            });
+          },
+        },
+      );
     }
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      {(createSale.error || updateSale.error) && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="error"
-            title={`${sale ? "Update Sale" : "Create Sale"} Failed:`}
-            subtitle={createSale.error?.message || updateSale.error?.message}
-            lowContrast
-          />
-        </div>
-      )}
-
-      {(createSale.isSuccess || updateSale.isSuccess) && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="success"
-            title={`${sale ? "Update Sale" : "Create Sale"} Success:`}
-            subtitle={createSale.data?.message || updateSale.data?.message}
-            lowContrast
-          />
-        </div>
-      )}
-
       <Stack gap={4}>
         <Select
           id="productId"

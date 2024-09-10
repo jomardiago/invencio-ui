@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  InlineNotification,
-  Loading,
-  Modal,
-  TableCell,
-} from "@carbon/react";
+import { Button, Loading, Modal, TableCell } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
 import { Sale, useSalesQuery } from "../../apis/useSalesQuery";
 import { formatToCurrency } from "../../../../common/utils/formatToCurrency";
@@ -15,6 +9,7 @@ import SideRail from "../../../../common/components/sideRail/SideRail";
 import SaleForm from "../saleForm/SaleForm";
 import { useDeleteSaleMutation } from "../../apis/useDeleteSaleMutation";
 import DataTable from "../../../../common/components/dataTable/DataTable";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const headers = [
   {
@@ -45,6 +40,7 @@ const headers = [
 
 function SalesTable() {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const sales = useSalesQuery(session?.id);
   const deleteSale = useDeleteSaleMutation(session?.id);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -81,6 +77,20 @@ function SalesTable() {
 
   const onDeleteSale = () => {
     deleteSale.mutate(Number(deleteConfig.data?.id), {
+      onSuccess: (data) => {
+        setToastNotification({
+          kind: "success",
+          title: "Delete Sale",
+          subTitle: data.message,
+        });
+      },
+      onError: (error) => {
+        setToastNotification({
+          kind: "error",
+          title: "Delete Sale",
+          subTitle: error.message,
+        });
+      },
       onSettled: () => setDeleteConfig({ data: undefined, isOpen: false }),
     });
   };
@@ -101,28 +111,6 @@ function SalesTable() {
   return (
     <div>
       <Loading active={sales.isLoading || deleteSale.isPending} />
-
-      {deleteSale.isError && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="error"
-            title="Delete Sale Failed:"
-            subtitle={deleteSale.error?.message}
-            lowContrast
-          />
-        </div>
-      )}
-
-      {deleteSale.isSuccess && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="success"
-            title="Delete Sale Success:"
-            subtitle={deleteSale.data?.message}
-            lowContrast
-          />
-        </div>
-      )}
 
       <SideRail
         isOpen={isFormOpen}

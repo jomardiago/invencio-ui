@@ -11,7 +11,7 @@ type CreateSalePayload = {
   total: number;
 };
 
-const createSale = (data: CreateSalePayload) => {
+const createSale = (data: CreateSalePayload): Promise<{ message: string }> => {
   return axiosInstance
     .post(`/sales`, data, getApiHeaders())
     .then((response) => response.data)
