@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@carbon/charts-react": "^1.20.0",
@@ -29,21 +31,28 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/node": "^22.5.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-istanbul": "^2.0.5",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "husky": "^9.1.5",
+    "jsdom": "^25.0.0",
     "lint-staged": "^15.2.9",
+    "msw": "^2.4.4",
     "prettier": "3.3.3",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
-    "vite-plugin-pages": "^0.32.3"
+    "vite-plugin-pages": "^0.32.3",
+    "vitest": "^2.0.5"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
