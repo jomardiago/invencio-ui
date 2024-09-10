@@ -27,10 +27,12 @@ export const useCreateUserMutation = (id: number | undefined) => {
 
   return useMutation({
     mutationFn: createUser,
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.byUserId(id),
       });
+
+      return response;
     },
     onError: (error: { message: string }) => {
       return error;

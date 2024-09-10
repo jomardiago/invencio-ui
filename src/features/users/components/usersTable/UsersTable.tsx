@@ -1,19 +1,13 @@
 import { useState } from "react";
 import { TrashCan, UserMultiple } from "@carbon/icons-react";
-import {
-  Button,
-  InlineNotification,
-  Loading,
-  Modal,
-  TableCell,
-  Toggle,
-} from "@carbon/react";
+import { Button, Loading, Modal, TableCell, Toggle } from "@carbon/react";
 import { format } from "date-fns";
 import useSessionStore from "../../../../stores/sessionStore";
 import { User, useUsersQuery } from "../../apis/useUsersQuery";
 import { useUpdateUserRoleMutation } from "../../apis/useUpdateUserRoleMutation";
 import { useDeleteUserMutation } from "../../apis/useDeleteUserMutation";
 import DataTable from "../../../../common/components/dataTable/DataTable";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 type UsersTableProps = {
   onAddNewClickHandler: () => void;
@@ -56,6 +50,7 @@ const headers = [
 
 function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const users = useUsersQuery(session?.id);
   const updateUserRole = useUpdateUserRoleMutation(session?.id);
   const deleteUser = useDeleteUserMutation(session?.id);
@@ -84,13 +79,45 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
   };
 
   const onToggleHandler = (data: User, value: boolean) => {
-    updateUserRole.mutate({ id: data.id, isAdmin: value });
+    updateUserRole.mutate(
+      { id: data.id, isAdmin: value },
+      {
+        onSuccess: (data) => {
+          setToastNotification({
+            kind: "success",
+            title: "Change Role",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Change Role",
+            subTitle: error.message,
+          });
+        },
+      },
+    );
   };
 
   const onDeleteUserHandler = () => {
     if (deleteConfig.data?.id) {
       deleteUser.mutate(deleteConfig.data.id, {
-        onSuccess: () => setDeleteConfig({ isOpen: false, data: undefined }),
+        onSuccess: (data) => {
+          setDeleteConfig({ isOpen: false, data: undefined });
+          setToastNotification({
+            kind: "success",
+            title: "Delete User",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Delete User",
+            subTitle: error.message,
+          });
+        },
       });
     }
   };
@@ -115,34 +142,6 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
         onRequestSubmit={onDeleteUserHandler}
         danger
       />
-
-      <div>
-        {updateUserRole.isSuccess && (
-          <InlineNotification
-            kind="success"
-            title="Update User Role:"
-            subtitle={updateUserRole.data?.message}
-            lowContrast
-          />
-        )}
-
-        {deleteUser.isSuccess && (
-          <InlineNotification
-            kind="success"
-            title="Delete User:"
-            subtitle={deleteUser.data?.message}
-            lowContrast
-          />
-        )}
-        {deleteUser.isError && (
-          <InlineNotification
-            kind="error"
-            title="Delete User Failed:"
-            subtitle={deleteUser.error?.message}
-            lowContrast
-          />
-        )}
-      </div>
 
       <DataTable
         key="usersTable"

@@ -1,16 +1,10 @@
-import {
-  Button,
-  Form,
-  InlineLoading,
-  InlineNotification,
-  Stack,
-  TextInput,
-} from "@carbon/react";
+import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCreateUserMutation } from "../../apis/useCreateUserMutation";
 import useSessionStore from "../../../../stores/sessionStore";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const formSchema = z.object({
   email: z
@@ -28,6 +22,7 @@ const formSchema = z.object({
 
 function UsersForm() {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const createUser = useCreateUserMutation(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,34 +34,26 @@ function UsersForm() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     createUser.mutate(values, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setToastNotification({
+          kind: "success",
+          title: "Create User",
+          subTitle: data.message,
+        });
         form.reset();
+      },
+      onError: (error) => {
+        setToastNotification({
+          kind: "error",
+          title: "Create User",
+          subTitle: error.message,
+        });
       },
     });
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      <div style={{ marginBottom: "1rem" }}>
-        {createUser.error && (
-          <InlineNotification
-            kind="error"
-            title="Create User Failed:"
-            subtitle={createUser.error?.message}
-            lowContrast
-          />
-        )}
-
-        {createUser.isSuccess && (
-          <InlineNotification
-            kind="success"
-            title="Create User Success:"
-            subtitle={createUser.data.message}
-            lowContrast
-          />
-        )}
-      </div>
-
       <Stack gap={4}>
         <TextInput
           id="email"
