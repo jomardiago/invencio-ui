@@ -1,20 +1,10 @@
 import { useState } from "react";
 import {
   Button,
-  DataTable,
   InlineNotification,
   Loading,
   Modal,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
 } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
 import { Sale, useSalesQuery } from "../../apis/useSalesQuery";
@@ -24,6 +14,7 @@ import { Edit, SalesOps, TrashCan } from "@carbon/icons-react";
 import SideRail from "../../../../common/components/sideRail/SideRail";
 import SaleForm from "../saleForm/SaleForm";
 import { useDeleteSaleMutation } from "../../apis/useDeleteSaleMutation";
+import DataTable from "../../../../common/components/dataTable/DataTable";
 
 const headers = [
   {
@@ -154,88 +145,52 @@ function SalesTable() {
         danger
       />
 
-      <DataTable rows={buildSales()} headers={headers}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getToolbarProps,
-          getTableContainerProps,
-          onInputChange,
-        }) => (
-          <TableContainer
-            title={
-              <div>
-                <SalesOps /> Sales Management
-              </div>
-            }
-            description="Manage all the sales in your inventory."
-            {...getTableContainerProps()}
-          >
-            <TableToolbar
-              {...getToolbarProps()}
-              aria-label="data table toolbar"
-            >
-              <TableToolbarContent>
-                <TableToolbarSearch onChange={onInputChange} />
-                <Button onClick={addSale}>Add New Sale</Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()} aria-label="Sales Table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({ header })}
-                      key={header.key}
-                    >
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })} key={row.id}>
-                    {row.cells.map((cell) => {
-                      if (cell.id.includes("rowActions")) {
-                        return (
-                          <TableCell key={cell.id}>
-                            <div>
-                              <Button
-                                renderIcon={Edit}
-                                iconDescription="Edit Sale"
-                                tooltipPosition="left"
-                                kind="secondary"
-                                onClick={() => editSale(row.id)}
-                                hasIconOnly
-                              />
-                              {session?.isAdmin && (
-                                <Button
-                                  renderIcon={TrashCan}
-                                  iconDescription="Delete Sale"
-                                  tooltipPosition="left"
-                                  kind="danger"
-                                  onClick={() => confirmDeleteSale(row.id)}
-                                  hasIconOnly
-                                />
-                              )}
-                            </div>
-                          </TableCell>
-                        );
-                      }
+      <DataTable
+        key="salesTable"
+        data={buildSales()}
+        headers={headers}
+        title={
+          <div>
+            <SalesOps /> Sales Management
+          </div>
+        }
+        description="Manage all the sales in your inventory."
+        tableLabel="Sales Table"
+        addNewConfig={{
+          onClick: addSale,
+          buttonLabel: "Add New Sale",
+        }}
+        renderRow={(rowId, cell) => {
+          if (cell.id.includes("rowActions")) {
+            return (
+              <TableCell key={cell.id}>
+                <div>
+                  <Button
+                    renderIcon={Edit}
+                    iconDescription="Edit Sale"
+                    tooltipPosition="left"
+                    kind="secondary"
+                    onClick={() => editSale(rowId)}
+                    hasIconOnly
+                  />
+                  {session?.isAdmin && (
+                    <Button
+                      renderIcon={TrashCan}
+                      iconDescription="Delete Sale"
+                      tooltipPosition="left"
+                      kind="danger"
+                      onClick={() => confirmDeleteSale(rowId)}
+                      hasIconOnly
+                    />
+                  )}
+                </div>
+              </TableCell>
+            );
+          }
 
-                      return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+          return <TableCell key={cell.id}>{cell.value}</TableCell>;
+        }}
+      />
     </div>
   );
 }
