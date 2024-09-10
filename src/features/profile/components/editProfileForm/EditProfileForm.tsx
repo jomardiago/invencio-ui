@@ -1,12 +1,5 @@
 import { useEffect } from "react";
-import {
-  Button,
-  Form,
-  InlineLoading,
-  InlineNotification,
-  Stack,
-  TextInput,
-} from "@carbon/react";
+import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,6 +7,7 @@ import useSessionStore from "../../../../stores/sessionStore";
 import { useUpdateProfileMutation } from "../../apis/useUpdateProfileMutation";
 import { useCreateProfileMutation } from "../../apis/useCreateProfileMutation";
 import { Profile } from "../../apis/useProfileQuery";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const formSchema = z.object({
   firstName: z.string().max(100, {
@@ -32,6 +26,7 @@ const formSchema = z.object({
 
 function EditProfileForm({ profile }: { profile?: Profile }) {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const updateProfile = useUpdateProfileMutation(session?.id);
   const createProfile = useCreateProfileMutation(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,40 +50,44 @@ function EditProfileForm({ profile }: { profile?: Profile }) {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (profile) {
-      updateProfile.mutate(values);
+      updateProfile.mutate(values, {
+        onSuccess: (data) => {
+          setToastNotification({
+            kind: "success",
+            title: "Update Profile",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Update Profile",
+            subTitle: error.message,
+          });
+        },
+      });
     } else {
-      createProfile.mutate(values);
+      createProfile.mutate(values, {
+        onSuccess: (data) => {
+          setToastNotification({
+            kind: "success",
+            title: "Create Profile",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Create Profile",
+            subTitle: error.message,
+          });
+        },
+      });
     }
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      {(createProfile.error || updateProfile.error) && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="error"
-            title={`${profile ? "Update Profile" : "Create Profile"} Failed:`}
-            subtitle={
-              createProfile.error?.message || updateProfile.error?.message
-            }
-            lowContrast
-          />
-        </div>
-      )}
-
-      {(createProfile.isSuccess || updateProfile.isSuccess) && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="success"
-            title={`${profile ? "Update Profile" : "Create Profile"} Success:`}
-            subtitle={
-              createProfile.data?.message || updateProfile.data?.message
-            }
-            lowContrast
-          />
-        </div>
-      )}
-
       <Stack gap={4}>
         <TextInput
           id="firstName"

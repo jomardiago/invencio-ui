@@ -1,15 +1,9 @@
-import {
-  Button,
-  Form,
-  InlineLoading,
-  InlineNotification,
-  Stack,
-  TextInput,
-} from "@carbon/react";
+import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useChangePasswordMutation } from "../../../auth/api/useChangePasswordMutation";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const formSchema = z.object({
   oldPassword: z.string().min(5, {
@@ -21,6 +15,7 @@ const formSchema = z.object({
 });
 
 function ChangePasswordForm() {
+  const { setToastNotification } = useToastNotificationStore();
   const changePassword = useChangePasswordMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -31,33 +26,26 @@ function ChangePasswordForm() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    changePassword.mutate(values);
+    changePassword.mutate(values, {
+      onSuccess: (data) => {
+        setToastNotification({
+          kind: "success",
+          title: "Update Password",
+          subTitle: data.message,
+        });
+      },
+      onError: (error) => {
+        setToastNotification({
+          kind: "error",
+          title: "Update Password",
+          subTitle: error.message,
+        });
+      },
+    });
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      {changePassword.error && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="error"
-            title="Change Password Failed:"
-            subtitle={changePassword.error.message}
-            lowContrast
-          />
-        </div>
-      )}
-
-      {changePassword.isSuccess && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="success"
-            title="Change Password Success:"
-            subtitle={changePassword.data.message}
-            lowContrast
-          />
-        </div>
-      )}
-
       <Stack gap={4}>
         <TextInput
           id="oldPassword"
