@@ -94,6 +94,7 @@ function EditProfileForm({ profile }: { profile?: Profile }) {
           id="firstName"
           type="text"
           labelText="First Name"
+          autoComplete="off"
           {...form.register("firstName")}
           invalid={Boolean(form.formState.errors.firstName)}
           invalidText={form.formState.errors.firstName?.message}
@@ -102,6 +103,7 @@ function EditProfileForm({ profile }: { profile?: Profile }) {
           id="lastName"
           type="text"
           labelText="Last Name"
+          autoComplete="off"
           {...form.register("lastName")}
           invalid={Boolean(form.formState.errors.lastName)}
           invalidText={form.formState.errors.lastName?.message}
@@ -110,6 +112,7 @@ function EditProfileForm({ profile }: { profile?: Profile }) {
           id="contactNumber"
           type="text"
           labelText="Contact Number"
+          autoComplete="off"
           {...form.register("contactNumber")}
           invalid={Boolean(form.formState.errors.contactNumber)}
           invalidText={form.formState.errors.contactNumber?.message}
@@ -118,6 +121,7 @@ function EditProfileForm({ profile }: { profile?: Profile }) {
           id="address"
           type="text"
           labelText="Address"
+          autoComplete="off"
           {...form.register("address")}
           invalid={Boolean(form.formState.errors.address)}
           invalidText={form.formState.errors.address?.message}
