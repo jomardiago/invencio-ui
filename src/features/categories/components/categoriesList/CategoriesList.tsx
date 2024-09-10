@@ -3,7 +3,6 @@ import {
   Button,
   ContainedList,
   ContainedListItem,
-  InlineNotification,
   Loading,
   Modal,
   Theme,
@@ -12,6 +11,7 @@ import { Edit, TrashCan } from "@carbon/icons-react";
 import useSessionStore from "../../../../stores/sessionStore";
 import { Category, useCategoriesQuery } from "../../apis/useCategoriesQuery";
 import { useDeleteCategoryMutation } from "../../apis/useDeleteCategory";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 type CategoriesListProps = {
   setSelectedCategory?: (category: Category) => void;
@@ -19,6 +19,7 @@ type CategoriesListProps = {
 
 function CategoriesList({ setSelectedCategory }: CategoriesListProps) {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const categories = useCategoriesQuery(session?.id);
   const deleteCategory = useDeleteCategoryMutation(session?.id);
   const [deleteConfig, setDeleteConfig] = useState<{
@@ -38,7 +39,23 @@ function CategoriesList({ setSelectedCategory }: CategoriesListProps) {
   const onCategoryDelete = () => {
     if (deleteConfig.data) {
       deleteCategory.mutate(deleteConfig.data, {
-        onSettled: () => setDeleteConfig({ isOpen: false, data: undefined }),
+        onSuccess: (data) => {
+          setToastNotification({
+            kind: "success",
+            title: "Delete Category",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Delete Category",
+            subTitle: error.message,
+          });
+        },
+        onSettled: () => {
+          setDeleteConfig({ isOpen: false, data: undefined });
+        },
       });
     }
   };
@@ -91,28 +108,6 @@ function CategoriesList({ setSelectedCategory }: CategoriesListProps) {
         onRequestSubmit={onCategoryDelete}
         danger
       />
-
-      {deleteCategory.isSuccess && (
-        <div>
-          <InlineNotification
-            kind="success"
-            title="Delete Category Success:"
-            subtitle={deleteCategory.data.message}
-            lowContrast
-          />
-        </div>
-      )}
-
-      {deleteCategory.isError && (
-        <div>
-          <InlineNotification
-            kind="error"
-            title="Delete Category Failed:"
-            subtitle={deleteCategory.error.message}
-            lowContrast
-          />
-        </div>
-      )}
 
       <Theme theme="white">
         <ContainedList label="All Categories" kind="on-page">

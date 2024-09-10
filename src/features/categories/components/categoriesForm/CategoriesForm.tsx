@@ -1,12 +1,5 @@
 import { Categories } from "@carbon/icons-react";
-import {
-  Button,
-  Form,
-  InlineLoading,
-  InlineNotification,
-  Stack,
-  TextInput,
-} from "@carbon/react";
+import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,6 +8,7 @@ import { useCreateCategoryMutation } from "../../apis/useCreateCategoryMutation"
 import { Category } from "../../apis/useCategoriesQuery";
 import { useUpdateCategoryMutation } from "../../apis/useUpdateCategoryMutation";
 import { useEffect } from "react";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 type CategoriesFormProps = {
   category?: Category;
@@ -29,6 +23,7 @@ const formSchema = z.object({
 
 function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const createCategory = useCreateCategoryMutation(session?.id);
   const updateCategory = useUpdateCategoryMutation(session?.id);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,15 +45,41 @@ function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
       updateCategory.mutate(
         { ...category, name: values.name },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             form.reset();
+            setToastNotification({
+              kind: "success",
+              title: "Update Category",
+              subTitle: data.message,
+            });
             if (onSaveCallback) onSaveCallback();
+          },
+          onError: (error) => {
+            setToastNotification({
+              kind: "error",
+              title: "Update Category",
+              subTitle: error.message,
+            });
           },
         },
       );
     } else {
       createCategory.mutate(values.name, {
-        onSuccess: () => form.reset(),
+        onSuccess: (data) => {
+          form.reset();
+          setToastNotification({
+            kind: "success",
+            title: "Create Category",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Create Category",
+            subTitle: error.message,
+          });
+        },
       });
     }
   };
@@ -73,32 +94,6 @@ function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
         style={{ marginTop: "1rem" }}
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        {(createCategory.error || updateCategory.error) && (
-          <div style={{ padding: "1rem 0" }}>
-            <InlineNotification
-              kind="error"
-              title={`${category ? "Update Category" : "Create Category"} Failed:`}
-              subtitle={
-                createCategory.error?.message || updateCategory.error?.message
-              }
-              lowContrast
-            />
-          </div>
-        )}
-
-        {(createCategory.isSuccess || updateCategory.isSuccess) && (
-          <div style={{ padding: "1rem 0" }}>
-            <InlineNotification
-              kind="success"
-              title={`${category ? "Update Category" : "Create Category"} Success:`}
-              subtitle={
-                createCategory.data?.message || updateCategory.data?.message
-              }
-              lowContrast
-            />
-          </div>
-        )}
-
         <Stack gap={4}>
           <TextInput
             id="name"
