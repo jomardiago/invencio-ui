@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import {
   Button,
   Form,
-  InlineNotification,
   Select,
   SelectItem,
   Stack,
@@ -16,6 +15,7 @@ import useSessionStore from "../../../../stores/sessionStore";
 import { useCreateProductMutation } from "../../apis/useCreateProductMutation";
 import { Product } from "../../apis/useProductsQuery";
 import { useUpdateProductMutation } from "../../apis/useUpdateProductMutation";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -56,6 +56,7 @@ const formSchema = z.object({
 
 function ProductForm({ product }: { product?: Product }) {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const categories = useCategoriesQuery(session?.id);
   const createProduct = useCreateProductMutation(session?.id);
   const updateProduct = useUpdateProductMutation(session?.id);
@@ -82,19 +83,52 @@ function ProductForm({ product }: { product?: Product }) {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (product) {
-      updateProduct.mutate({
-        id: product.id,
-        buyingPrice: values.buyingPrice,
-        categoryId: Number(values.categoryId),
-        sellingPrice: values.sellingPrice,
-        stock: values.stock,
-        title: values.title,
-      });
+      updateProduct.mutate(
+        {
+          id: product.id,
+          buyingPrice: values.buyingPrice,
+          categoryId: Number(values.categoryId),
+          sellingPrice: values.sellingPrice,
+          stock: values.stock,
+          title: values.title,
+        },
+        {
+          onSuccess: (data) => {
+            form.reset();
+            setToastNotification({
+              kind: "success",
+              title: "Update Product",
+              subTitle: data.message,
+            });
+          },
+          onError: (error) => {
+            setToastNotification({
+              kind: "success",
+              title: "Update Product",
+              subTitle: error.message,
+            });
+          },
+        },
+      );
     } else {
       createProduct.mutate(
         { ...values, categoryId: Number(values.categoryId) },
         {
-          onSuccess: () => form.reset(),
+          onSuccess: (data) => {
+            form.reset();
+            setToastNotification({
+              kind: "success",
+              title: "Create Product",
+              subTitle: data.message,
+            });
+          },
+          onError: (error) => {
+            setToastNotification({
+              kind: "success",
+              title: "Create Product",
+              subTitle: error.message,
+            });
+          },
         },
       );
     }
@@ -102,32 +136,6 @@ function ProductForm({ product }: { product?: Product }) {
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      {createProduct.error && updateProduct.error && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="error"
-            title={`${product ? "Update Product" : "Create Product"} Failed:`}
-            subtitle={
-              createProduct.error.message || updateProduct.error.message
-            }
-            lowContrast
-          />
-        </div>
-      )}
-
-      {(createProduct.isSuccess || updateProduct.isSuccess) && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="success"
-            title={`${product ? "Update Product" : "Create Product"} Success:`}
-            subtitle={
-              createProduct.data?.message || updateProduct.data?.message
-            }
-            lowContrast
-          />
-        </div>
-      )}
-
       <Stack gap={4}>
         <TextInput
           id="title"

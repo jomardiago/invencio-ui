@@ -1,11 +1,5 @@
 import { Edit, Product, TrashCan } from "@carbon/icons-react";
-import {
-  Button,
-  InlineNotification,
-  Loading,
-  Modal,
-  TableCell,
-} from "@carbon/react";
+import { Button, Loading, Modal, TableCell } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
 import {
   Product as ProductType,
@@ -18,6 +12,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useDeleteProductMutation } from "../../apis/useDeleteProductMutation";
 import DataTable from "../../../../common/components/dataTable/DataTable";
+import useToastNotificationStore from "../../../../stores/toastNotificationStore";
 
 const headers = [
   {
@@ -52,6 +47,7 @@ const headers = [
 
 function ProductsTable() {
   const { session } = useSessionStore();
+  const { setToastNotification } = useToastNotificationStore();
   const products = useProductsQuery(session?.id);
   const deleteProduct = useDeleteProductMutation(session?.id);
   const [isCreateProductFormOpen, setIsCreateProductFormOpen] = useState(false);
@@ -82,6 +78,20 @@ function ProductsTable() {
   const onDeleteProductHandler = () => {
     if (delProductConfig.data?.id) {
       deleteProduct.mutate(delProductConfig.data.id, {
+        onSuccess: (data) => {
+          setToastNotification({
+            kind: "success",
+            title: "Delete Product",
+            subTitle: data.message,
+          });
+        },
+        onError: (error) => {
+          setToastNotification({
+            kind: "error",
+            title: "Delete Product",
+            subTitle: error.message,
+          });
+        },
         onSettled: () =>
           setDelProductConfig({ data: undefined, isOpen: false }),
       });
@@ -104,28 +114,6 @@ function ProductsTable() {
   return (
     <div>
       <Loading active={products.isLoading || deleteProduct.isPending} />
-
-      {deleteProduct.error && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="error"
-            title="Delete Product Failed:"
-            subtitle={deleteProduct.error.message}
-            lowContrast
-          />
-        </div>
-      )}
-
-      {deleteProduct.isSuccess && (
-        <div style={{ padding: "1rem 0" }}>
-          <InlineNotification
-            kind="success"
-            title="Delete Product Success:"
-            subtitle={deleteProduct.data?.message}
-            lowContrast
-          />
-        </div>
-      )}
 
       <SideRail
         isOpen={isCreateProductFormOpen}

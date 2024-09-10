@@ -12,7 +12,9 @@ type CreateProductPayload = {
   categoryId: number;
 };
 
-const createProduct = (data: CreateProductPayload) => {
+const createProduct = (
+  data: CreateProductPayload,
+): Promise<{ message: string }> => {
   return axiosInstance
     .post(`/products`, data, getApiHeaders())
     .then((response) => response.data)
