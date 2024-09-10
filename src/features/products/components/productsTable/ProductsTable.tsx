@@ -1,20 +1,10 @@
 import { Edit, Product, TrashCan } from "@carbon/icons-react";
 import {
   Button,
-  DataTable,
   InlineNotification,
   Loading,
   Modal,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
 } from "@carbon/react";
 import useSessionStore from "../../../../stores/sessionStore";
 import {
@@ -27,6 +17,7 @@ import ProductForm from "../productForm/ProductForm";
 import { useState } from "react";
 import { format } from "date-fns";
 import { useDeleteProductMutation } from "../../apis/useDeleteProductMutation";
+import DataTable from "../../../../common/components/dataTable/DataTable";
 
 const headers = [
   {
@@ -157,90 +148,52 @@ function ProductsTable() {
         danger
       />
 
-      <DataTable rows={buildProducts()} headers={headers}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getToolbarProps,
-          getTableContainerProps,
-          onInputChange,
-        }) => (
-          <TableContainer
-            title={
-              <div>
-                <Product /> Products Management
-              </div>
-            }
-            description="Manage all the products in your inventory."
-            {...getTableContainerProps()}
-          >
-            <TableToolbar
-              {...getToolbarProps()}
-              aria-label="data table toolbar"
-            >
-              <TableToolbarContent>
-                <TableToolbarSearch onChange={onInputChange} />
-                <Button onClick={() => setIsCreateProductFormOpen(true)}>
-                  Add New Product
-                </Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()} aria-label="Products Table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({ header })}
-                      key={header.key}
-                    >
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })} key={row.id}>
-                    {row.cells.map((cell) => {
-                      if (cell.id.includes("rowActions")) {
-                        return (
-                          <TableCell key={cell.id}>
-                            <div>
-                              <Button
-                                renderIcon={Edit}
-                                iconDescription="Edit Product"
-                                tooltipPosition="left"
-                                kind="secondary"
-                                onClick={() => onEditProduct(row.id)}
-                                hasIconOnly
-                              />
-                              {session?.isAdmin && (
-                                <Button
-                                  renderIcon={TrashCan}
-                                  iconDescription="Delete Product"
-                                  tooltipPosition="left"
-                                  kind="danger"
-                                  onClick={() => onDeleteProduct(row.id)}
-                                  hasIconOnly
-                                />
-                              )}
-                            </div>
-                          </TableCell>
-                        );
-                      }
+      <DataTable
+        key="productsTable"
+        data={buildProducts()}
+        headers={headers}
+        title={
+          <div>
+            <Product /> Products Management
+          </div>
+        }
+        description="Manage all the products in your inventory."
+        tableLabel="Products Table"
+        addNewConfig={{
+          onClick: () => setIsCreateProductFormOpen(true),
+          buttonLabel: "Add New Product",
+        }}
+        renderRow={(rowId, cell) => {
+          if (cell.id.includes("rowActions")) {
+            return (
+              <TableCell key={cell.id}>
+                <div>
+                  <Button
+                    renderIcon={Edit}
+                    iconDescription="Edit Product"
+                    tooltipPosition="left"
+                    kind="secondary"
+                    onClick={() => onEditProduct(rowId)}
+                    hasIconOnly
+                  />
+                  {session?.isAdmin && (
+                    <Button
+                      renderIcon={TrashCan}
+                      iconDescription="Delete Product"
+                      tooltipPosition="left"
+                      kind="danger"
+                      onClick={() => onDeleteProduct(rowId)}
+                      hasIconOnly
+                    />
+                  )}
+                </div>
+              </TableCell>
+            );
+          }
 
-                      return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+          return <TableCell key={cell.id}>{cell.value}</TableCell>;
+        }}
+      />
     </div>
   );
 }
