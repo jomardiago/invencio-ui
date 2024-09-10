@@ -1,9 +1,10 @@
-import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
+import { Form, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useChangePasswordMutation } from "../../../auth/api/useChangePasswordMutation";
 import useToastNotificationStore from "../../../../stores/toastNotificationStore";
+import SubmitButton from "../../../../common/components/submitButton/SubmitButton";
 
 const formSchema = z.object({
   oldPassword: z.string().min(5, {
@@ -63,11 +64,12 @@ function ChangePasswordForm() {
           invalid={Boolean(form.formState.errors.newPassword)}
           invalidText={form.formState.errors.newPassword?.message}
         />
-        {changePassword.isPending ? (
-          <InlineLoading description="Saving..." />
-        ) : (
-          <Button type="submit">Update Password</Button>
-        )}
+        <SubmitButton
+          isLoading={changePassword.isPending}
+          loadingText="Updating..."
+        >
+          Update Password
+        </SubmitButton>
       </Stack>
     </Form>
   );

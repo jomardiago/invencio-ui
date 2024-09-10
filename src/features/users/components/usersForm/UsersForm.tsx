@@ -1,10 +1,11 @@
-import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
+import { Form, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCreateUserMutation } from "../../apis/useCreateUserMutation";
 import useSessionStore from "../../../../stores/sessionStore";
 import useToastNotificationStore from "../../../../stores/toastNotificationStore";
+import SubmitButton from "../../../../common/components/submitButton/SubmitButton";
 
 const formSchema = z.object({
   email: z
@@ -72,11 +73,9 @@ function UsersForm() {
           invalid={Boolean(form.formState.errors.password)}
           invalidText={form.formState.errors.password?.message}
         />
-        {createUser.isPending ? (
-          <InlineLoading description="Saving..." />
-        ) : (
-          <Button type="submit">Save</Button>
-        )}
+        <SubmitButton isLoading={createUser.isPending} loadingText="Saving...">
+          Save
+        </SubmitButton>
       </Stack>
     </Form>
   );

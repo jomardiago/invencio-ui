@@ -1,5 +1,5 @@
 import { Categories } from "@carbon/icons-react";
-import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
+import { Form, Stack, TextInput } from "@carbon/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { Category } from "../../apis/useCategoriesQuery";
 import { useUpdateCategoryMutation } from "../../apis/useUpdateCategoryMutation";
 import { useEffect } from "react";
 import useToastNotificationStore from "../../../../stores/toastNotificationStore";
+import SubmitButton from "../../../../common/components/submitButton/SubmitButton";
 
 type CategoriesFormProps = {
   category?: Category;
@@ -104,13 +105,12 @@ function CategoriesForm({ category, onSaveCallback }: CategoriesFormProps) {
             invalid={Boolean(form.formState.errors.name)}
             invalidText={form.formState.errors.name?.message}
           />
-          {createCategory.isPending || updateCategory.isPending ? (
-            <InlineLoading
-              description={`${category ? "Updating..." : "Saving..."}`}
-            />
-          ) : (
-            <Button type="submit">Save</Button>
-          )}
+          <SubmitButton
+            isLoading={createCategory.isPending || updateCategory.isPending}
+            loadingText="Saving..."
+          >
+            Save
+          </SubmitButton>
         </Stack>
       </Form>
     </div>

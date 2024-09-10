@@ -1,12 +1,4 @@
-import {
-  Button,
-  Form,
-  InlineLoading,
-  Select,
-  SelectItem,
-  Stack,
-  TextInput,
-} from "@carbon/react";
+import { Form, Select, SelectItem, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,6 +9,7 @@ import { useEffect } from "react";
 import { Sale } from "../../apis/useSalesQuery";
 import { useUpdateSaleMutation } from "../../apis/useUpdateSaleMutation";
 import useToastNotificationStore from "../../../../stores/toastNotificationStore";
+import SubmitButton from "../../../../common/components/submitButton/SubmitButton";
 
 const formSchema = z.object({
   productId: z.string().min(1, {
@@ -190,11 +183,12 @@ function SaleForm({ sale }: { sale?: Sale }) {
           invalidText={form.formState.errors.total?.message}
           disabled
         />
-        {createSale.isPending ? (
-          <InlineLoading description="Saving..." />
-        ) : (
-          <Button type="submit">Save</Button>
-        )}
+        <SubmitButton
+          isLoading={createSale.isPending || updateSale.isPending}
+          loadingText="Saving..."
+        >
+          Save
+        </SubmitButton>
       </Stack>
     </Form>
   );

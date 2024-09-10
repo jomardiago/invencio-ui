@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Button, Form, InlineLoading, Stack, TextInput } from "@carbon/react";
+import { Form, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import { useUpdateProfileMutation } from "../../apis/useUpdateProfileMutation";
 import { useCreateProfileMutation } from "../../apis/useCreateProfileMutation";
 import { Profile } from "../../apis/useProfileQuery";
 import useToastNotificationStore from "../../../../stores/toastNotificationStore";
+import SubmitButton from "../../../../common/components/submitButton/SubmitButton";
 
 const formSchema = z.object({
   firstName: z.string().max(100, {
@@ -121,11 +122,12 @@ function EditProfileForm({ profile }: { profile?: Profile }) {
           invalid={Boolean(form.formState.errors.address)}
           invalidText={form.formState.errors.address?.message}
         />
-        {updateProfile.isPending ? (
-          <InlineLoading description="Saving..." />
-        ) : (
-          <Button type="submit">Save</Button>
-        )}
+        <SubmitButton
+          isLoading={createProfile.isPending || updateProfile.isPending}
+          loadingText="Saving..."
+        >
+          Save
+        </SubmitButton>
       </Stack>
     </Form>
   );

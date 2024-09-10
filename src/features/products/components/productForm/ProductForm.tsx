@@ -1,12 +1,5 @@
 import { useEffect } from "react";
-import {
-  Button,
-  Form,
-  Select,
-  SelectItem,
-  Stack,
-  TextInput,
-} from "@carbon/react";
+import { Form, Select, SelectItem, Stack, TextInput } from "@carbon/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +9,7 @@ import { useCreateProductMutation } from "../../apis/useCreateProductMutation";
 import { Product } from "../../apis/useProductsQuery";
 import { useUpdateProductMutation } from "../../apis/useUpdateProductMutation";
 import useToastNotificationStore from "../../../../stores/toastNotificationStore";
+import SubmitButton from "../../../../common/components/submitButton/SubmitButton";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -182,7 +176,12 @@ function ProductForm({ product }: { product?: Product }) {
             />
           ))}
         </Select>
-        <Button type="submit">Save</Button>
+        <SubmitButton
+          isLoading={createProduct.isPending || updateProduct.isPending}
+          loadingText="Saving..."
+        >
+          Save
+        </SubmitButton>
       </Stack>
     </Form>
   );
