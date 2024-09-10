@@ -2,16 +2,24 @@
   width: 100%;
 
   .countWidgets {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
+
+    @media (min-width: 1056px) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   .topChartsWrapper {
-    display: flex;
-    width: 100%;
     margin-top: 2rem;
-    gap: 2rem;
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+
+    @media (min-width: 1056px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
     .chartContainer {
       flex: 1;

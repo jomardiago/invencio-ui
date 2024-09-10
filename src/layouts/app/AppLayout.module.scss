@@ -2,9 +2,13 @@
 
 .container {
   min-height: 100vh;
-  padding-left: 280px;
+  padding-left: 2rem;
   padding-top: 70px;
   padding-right: 2rem;
+
+  @media (min-width: 1056px) {
+    padding-left: 280px;
+  }
 }
 
 .currentDate {
