@@ -165,6 +165,7 @@ function UsersTable({ onAddNewClickHandler }: UsersTableProps) {
             return (
               <TableCell key={cell.id}>
                 <Toggle
+                  data-testid="isAdminToggle"
                   size="sm"
                   labelText=""
                   labelA="No"
